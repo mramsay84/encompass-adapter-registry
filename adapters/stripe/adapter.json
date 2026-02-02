@@ -1,7 +1,7 @@
 {
   "slug": "stripe",
   "name": "Stripe",
-  "version": "2026-01-28.clover",
+  "version": "2.0.0",
   "description": "Complete Stripe API integration - payments, subscriptions, invoices, customers, and more",
   "type": "payment",
   "provider": {
