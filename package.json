@@ -1,0 +1,15 @@
+{
+  "name": "encompass-adapter-registry",
+  "version": "1.0.0",
+  "description": "Official adapter registry for Encompass platform - auto-generated from OpenAPI specs",
+  "type": "module",
+  "scripts": {
+    "generate:stripe": "npx tsx scripts/generate-stripe.ts",
+    "generate:all": "npx tsx scripts/generate-all.ts",
+    "validate": "npx tsx scripts/validate.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "tsx": "^4.7.0"
+  }
+}

@@ -1,9 +1,8 @@
 {
-  "$schema": "../../schemas/adapter.schema.json",
   "slug": "stripe",
   "name": "Stripe",
-  "version": "1.0.0",
-  "description": "Accept payments, manage subscriptions, and handle invoicing with Stripe.",
+  "version": "2026-01-28.clover",
+  "description": "Complete Stripe API integration - payments, subscriptions, invoices, customers, and more",
   "type": "payment",
   "provider": {
     "name": "Stripe",
@@ -15,31 +14,42 @@
     "type": "api_key",
     "fields": [
       {
-        "name": "api_key",
+        "name": "secret_key",
         "label": "Secret Key",
         "type": "password",
         "required": true,
-        "placeholder": "sk_live_xxx or sk_test_xxx",
-        "helpText": "Your Stripe secret key. Use sk_test_xxx for sandbox testing."
+        "placeholder": "sk_live_..."
+      },
+      {
+        "name": "publishable_key",
+        "label": "Publishable Key",
+        "type": "text",
+        "required": false,
+        "placeholder": "pk_live_..."
       },
       {
         "name": "webhook_secret",
         "label": "Webhook Signing Secret",
         "type": "password",
         "required": false,
-        "placeholder": "whsec_xxx",
-        "helpText": "Webhook signing secret for verifying webhook signatures. Find this in Stripe Dashboard > Webhooks."
+        "placeholder": "whsec_..."
       }
     ],
-    "testEndpoint": "/balance"
+    "testEndpoint": "https://api.stripe.com/v1/balance"
   },
   "rateLimit": {
-    "requestsPerMinute": 100,
-    "requestsPerHour": 1000
+    "requestsPerSecond": 100,
+    "requestsPerMinute": 2000
   },
-  "icon": "stripe",
-  "tags": ["payment", "subscriptions", "invoicing", "checkout", "billing"],
-  "aiDescription": "Stripe adapter with full SDK access. Supports payments, subscriptions, invoices, checkout sessions, billing portal, Connect for marketplaces, and 80+ webhook events.",
-  "aiInstructions": "When helping users with Stripe:\n- For one-time payments, use create_payment_intent with amount (in cents) and currency\n- For recurring billing, create a product, then a price, then a subscription\n- For hosted checkout, use create_checkout_session with line_items\n- Customer IDs start with \"cus_\", payment intents with \"pi_\", subscriptions with \"sub_\"\n- Amounts are always in the smallest currency unit (e.g., cents for USD)\n- Use metadata to store custom data on any Stripe object",
-  "setupInstructions": "## Setting up Stripe\n\n1. **Get your API keys**\n   - Go to [Stripe Dashboard](https://dashboard.stripe.com/apikeys)\n   - Copy your **Secret key** (starts with `sk_test_` or `sk_live_`)\n\n2. **Configure webhooks** (optional but recommended)\n   - Go to [Stripe Webhooks](https://dashboard.stripe.com/webhooks)\n   - Add a new endpoint with your webhook URL\n   - Copy the **Signing secret** (starts with `whsec_`)\n\n3. **Test mode vs Live mode**\n   - Use `sk_test_` keys for development\n   - Switch to `sk_live_` for production"
+  "tags": [
+    "payments",
+    "subscriptions",
+    "invoices",
+    "billing",
+    "checkout",
+    "connect"
+  ],
+  "generatedFrom": "openapi",
+  "generatedAt": "2026-02-02T08:38:21.448Z",
+  "openApiVersion": "2026-01-28.clover"
 }
