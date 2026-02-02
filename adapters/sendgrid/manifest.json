@@ -1,0 +1,146 @@
+{
+  "actions": [
+    {
+      "id": "send_email",
+      "name": "Send Email",
+      "description": "Send a transactional email with text and/or HTML content",
+      "category": "email",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "subject"],
+        "properties": {
+          "to": { "type": ["string", "array"], "description": "Recipient email(s)" },
+          "from": { "type": "string", "description": "Sender email" },
+          "fromName": { "type": "string", "description": "Sender display name" },
+          "subject": { "type": "string", "description": "Email subject line" },
+          "text": { "type": "string", "description": "Plain text content" },
+          "html": { "type": "string", "description": "HTML content" },
+          "replyTo": { "type": "string", "description": "Reply-to email address" },
+          "cc": { "type": ["string", "array"], "description": "CC recipient(s)" },
+          "bcc": { "type": ["string", "array"], "description": "BCC recipient(s)" },
+          "categories": { "type": "array", "items": { "type": "string" }, "description": "Categories for analytics" }
+        }
+      }
+    },
+    {
+      "id": "send_template_email",
+      "name": "Send Template Email",
+      "description": "Send an email using a dynamic template",
+      "category": "email",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "templateId"],
+        "properties": {
+          "to": { "type": ["string", "array"], "description": "Recipient email(s)" },
+          "from": { "type": "string", "description": "Sender email" },
+          "templateId": { "type": "string", "description": "Dynamic template ID (d-xxxxx)" },
+          "dynamicTemplateData": { "type": "object", "description": "Variables to substitute in template" },
+          "replyTo": { "type": "string" },
+          "cc": { "type": ["string", "array"] },
+          "bcc": { "type": ["string", "array"] }
+        }
+      }
+    },
+    {
+      "id": "list_templates",
+      "name": "List Templates",
+      "description": "List all dynamic templates",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "generations": { "type": "string", "enum": ["legacy", "dynamic", "legacy,dynamic"], "default": "dynamic" },
+          "pageSize": { "type": "number", "default": 10 }
+        }
+      }
+    },
+    {
+      "id": "create_contact",
+      "name": "Create/Update Contact",
+      "description": "Add or update a contact in your marketing list",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "phoneNumber": { "type": "string" },
+          "customFields": { "type": "object" },
+          "listIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "get_stats",
+      "name": "Get Email Statistics",
+      "description": "Get aggregate email statistics",
+      "category": "analytics",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startDate": { "type": "string", "description": "Start date (YYYY-MM-DD)" },
+          "endDate": { "type": "string", "description": "End date (YYYY-MM-DD)" },
+          "aggregatedBy": { "type": "string", "enum": ["day", "week", "month"], "default": "day" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "on_delivered",
+      "name": "Email Delivered",
+      "description": "Triggered when email is delivered to recipient",
+      "event": "delivered"
+    },
+    {
+      "id": "on_opened",
+      "name": "Email Opened",
+      "description": "Triggered when recipient opens email",
+      "event": "open"
+    },
+    {
+      "id": "on_clicked",
+      "name": "Link Clicked",
+      "description": "Triggered when recipient clicks a link",
+      "event": "click"
+    },
+    {
+      "id": "on_bounced",
+      "name": "Email Bounced",
+      "description": "Triggered when email bounces",
+      "event": "bounce"
+    },
+    {
+      "id": "on_unsubscribed",
+      "name": "Unsubscribed",
+      "description": "Triggered when recipient unsubscribes",
+      "event": "unsubscribe"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "x-twilio-email-event-webhook-signature",
+    "signatureAlgorithm": "hmac-sha256"
+  },
+  "mcp": {
+    "tools": [
+      {
+        "name": "sendgrid_send_email",
+        "description": "Send an email to one or more recipients with optional template",
+        "inputSchema": {
+          "type": "object",
+          "required": ["to", "subject"],
+          "properties": {
+            "to": { "type": "string", "description": "Recipient email(s), comma-separated" },
+            "subject": { "type": "string", "description": "Email subject" },
+            "body": { "type": "string", "description": "Email body (HTML or plain text)" },
+            "template_id": { "type": "string", "description": "Optional template ID" },
+            "template_data": { "type": "object", "description": "Template variables" }
+          }
+        }
+      }
+    ]
+  }
+}

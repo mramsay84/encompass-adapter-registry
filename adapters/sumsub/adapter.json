@@ -1,0 +1,42 @@
+{
+  "$schema": "../../schemas/adapter.schema.json",
+  "slug": "sumsub",
+  "name": "SumSub",
+  "version": "1.0.0",
+  "description": "KYC/KYB identity verification with document checks, liveness detection, and AML screening. Supports 220+ countries.",
+  "type": "kyc",
+  "provider": {
+    "name": "SumSub",
+    "website": "https://sumsub.com",
+    "documentation": "https://docs.sumsub.com"
+  },
+  "authentication": {
+    "type": "api_key",
+    "fields": [
+      {
+        "name": "app_token",
+        "label": "App Token",
+        "type": "text",
+        "required": true,
+        "placeholder": "sbx:xxxxxxxx or prd:xxxxxxxx",
+        "helpText": "Your SumSub App Token. Find in Dashboard → App Tokens."
+      },
+      {
+        "name": "secret_key",
+        "label": "Secret Key",
+        "type": "password",
+        "required": true,
+        "helpText": "Your SumSub Secret Key for HMAC signing."
+      }
+    ],
+    "testEndpoint": "/resources/accessTokens/-/applicants"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 100
+  },
+  "icon": "sumsub",
+  "tags": ["kyc", "kyb", "identity", "verification", "compliance", "aml"],
+  "aiDescription": "SumSub adapter for KYC/KYB identity verification. Create applicants, generate SDK tokens, upload documents, and track verification status.",
+  "aiInstructions": "When helping users with SumSub:\n- First create an applicant with create_applicant using their external user ID\n- For web/mobile integration, use generate_access_token to get WebSDK token\n- For API-only, upload docs with add_document then request_verification\n- Check status with get_applicant_status\n- GREEN = approved, RED = rejected\n- levelName must match a level configured in their SumSub dashboard",
+  "setupInstructions": "## Setting up SumSub\n\n1. **Create a SumSub Account**\n   - Go to [SumSub](https://sumsub.com/) and sign up\n\n2. **Get API Credentials**\n   - Go to App Tokens in your dashboard\n   - Create a new App Token\n   - Copy your App Token and Secret Key\n\n3. **Configure Verification Levels**\n   - Create verification levels for your use case\n   - Define required documents and checks per level\n\n4. **Set up Webhooks**\n   - Go to Webhooks in your dashboard\n   - Add your webhook URL\n   - Copy the webhook secret"
+}

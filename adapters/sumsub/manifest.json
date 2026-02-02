@@ -1,0 +1,160 @@
+{
+  "actions": [
+    {
+      "id": "create_applicant",
+      "name": "Create Applicant",
+      "description": "Create a new applicant for verification",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["externalUserId", "levelName"],
+        "properties": {
+          "externalUserId": { "type": "string", "description": "Your app's user ID" },
+          "levelName": { "type": "string", "description": "Verification level name configured in dashboard" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "dateOfBirth": { "type": "string", "description": "YYYY-MM-DD format" },
+          "country": { "type": "string", "description": "ISO 3166-1 alpha-3 country code" }
+        }
+      }
+    },
+    {
+      "id": "get_applicant",
+      "name": "Get Applicant",
+      "description": "Get applicant details by ID",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string", "description": "SumSub applicant ID" }
+        }
+      }
+    },
+    {
+      "id": "get_applicant_status",
+      "name": "Get Applicant Status",
+      "description": "Get verification status for an applicant",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "generate_access_token",
+      "name": "Generate Access Token",
+      "description": "Generate a WebSDK access token for an applicant",
+      "category": "sdk",
+      "configSchema": {
+        "type": "object",
+        "required": ["externalUserId", "levelName"],
+        "properties": {
+          "externalUserId": { "type": "string", "description": "Your app's user ID" },
+          "levelName": { "type": "string", "description": "Verification level" },
+          "ttlInSecs": { "type": "number", "default": 600, "description": "Token TTL in seconds" }
+        }
+      }
+    },
+    {
+      "id": "add_document",
+      "name": "Add Document",
+      "description": "Upload a document for an applicant",
+      "category": "documents",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "idDocType", "content"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "idDocType": { "type": "string", "description": "Document type: PASSPORT, ID_CARD, DRIVERS, etc." },
+          "content": { "type": "string", "description": "Base64 encoded document image" },
+          "country": { "type": "string", "description": "Issuing country code" }
+        }
+      }
+    },
+    {
+      "id": "request_verification",
+      "name": "Request Verification",
+      "description": "Start verification check for an applicant",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "reason": { "type": "string", "description": "Optional reason for check" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "on_applicant_created",
+      "name": "Applicant Created",
+      "description": "Triggered when a new applicant is created",
+      "event": "applicantCreated"
+    },
+    {
+      "id": "on_applicant_pending",
+      "name": "Applicant Pending",
+      "description": "Triggered when applicant is awaiting review",
+      "event": "applicantPending"
+    },
+    {
+      "id": "on_applicant_reviewed",
+      "name": "Applicant Reviewed",
+      "description": "Triggered when verification review is completed",
+      "event": "applicantReviewed"
+    },
+    {
+      "id": "on_applicant_approved",
+      "name": "Applicant Approved",
+      "description": "Triggered when applicant is approved (GREEN)",
+      "event": "applicantApproved"
+    },
+    {
+      "id": "on_applicant_rejected",
+      "name": "Applicant Rejected",
+      "description": "Triggered when applicant is rejected (RED)",
+      "event": "applicantRejected"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "x-payload-digest",
+    "signatureAlgorithm": "hmac-sha256"
+  },
+  "mcp": {
+    "tools": [
+      {
+        "name": "sumsub_verify_user",
+        "description": "Start KYC verification for a user",
+        "inputSchema": {
+          "type": "object",
+          "required": ["user_id", "level"],
+          "properties": {
+            "user_id": { "type": "string", "description": "Your app's user ID" },
+            "level": { "type": "string", "description": "Verification level" },
+            "email": { "type": "string", "description": "User email" }
+          }
+        }
+      },
+      {
+        "name": "sumsub_check_status",
+        "description": "Check verification status for a user",
+        "inputSchema": {
+          "type": "object",
+          "required": ["user_id"],
+          "properties": {
+            "user_id": { "type": "string", "description": "Your app's user ID" }
+          }
+        }
+      }
+    ]
+  }
+}

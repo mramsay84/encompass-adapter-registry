@@ -1,0 +1,199 @@
+{
+  "actions": [
+    {
+      "id": "create_envelope",
+      "name": "Create Envelope",
+      "description": "Create and optionally send an envelope for signing",
+      "category": "envelopes",
+      "configSchema": {
+        "type": "object",
+        "required": ["emailSubject", "recipients"],
+        "properties": {
+          "emailSubject": { "type": "string", "description": "Subject line for the envelope email" },
+          "emailBlurb": { "type": "string", "description": "Optional message in the email body" },
+          "templateId": { "type": "string", "description": "Template ID to use" },
+          "documents": {
+            "type": "array",
+            "description": "Documents to include",
+            "items": {
+              "type": "object",
+              "properties": {
+                "documentId": { "type": "string" },
+                "name": { "type": "string" },
+                "documentBase64": { "type": "string" },
+                "fileExtension": { "type": "string" }
+              }
+            }
+          },
+          "recipients": {
+            "type": "object",
+            "properties": {
+              "signers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "email": { "type": "string" },
+                    "recipientId": { "type": "string" },
+                    "routingOrder": { "type": "string" }
+                  }
+                }
+              },
+              "carbonCopies": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "status": { "type": "string", "enum": ["created", "sent"], "default": "sent" }
+        }
+      }
+    },
+    {
+      "id": "get_envelope",
+      "name": "Get Envelope",
+      "description": "Retrieve envelope details and status",
+      "category": "envelopes",
+      "configSchema": {
+        "type": "object",
+        "required": ["envelopeId"],
+        "properties": {
+          "envelopeId": { "type": "string", "description": "Envelope ID (GUID)" },
+          "include": { "type": "string", "description": "Items to include: recipients, documents, tabs" }
+        }
+      }
+    },
+    {
+      "id": "void_envelope",
+      "name": "Void Envelope",
+      "description": "Void an envelope that has not been completed",
+      "category": "envelopes",
+      "configSchema": {
+        "type": "object",
+        "required": ["envelopeId", "voidedReason"],
+        "properties": {
+          "envelopeId": { "type": "string" },
+          "voidedReason": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_document",
+      "name": "Get Signed Document",
+      "description": "Download a signed document from an envelope",
+      "category": "documents",
+      "configSchema": {
+        "type": "object",
+        "required": ["envelopeId"],
+        "properties": {
+          "envelopeId": { "type": "string" },
+          "documentId": { "type": "string", "default": "combined", "description": "Document ID or 'combined'" }
+        }
+      }
+    },
+    {
+      "id": "list_envelopes",
+      "name": "List Envelopes",
+      "description": "List envelopes with optional filtering",
+      "category": "envelopes",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "fromDate": { "type": "string", "description": "Start date (ISO format)" },
+          "toDate": { "type": "string", "description": "End date (ISO format)" },
+          "status": { "type": "string", "description": "Filter by status" },
+          "count": { "type": "number", "default": 25 }
+        }
+      }
+    },
+    {
+      "id": "list_templates",
+      "name": "List Templates",
+      "description": "List available templates in the account",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "number", "default": 25 },
+          "searchText": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "resend_envelope",
+      "name": "Resend Envelope",
+      "description": "Resend envelope notification to recipients",
+      "category": "envelopes",
+      "configSchema": {
+        "type": "object",
+        "required": ["envelopeId"],
+        "properties": {
+          "envelopeId": { "type": "string" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "on_envelope_sent",
+      "name": "Envelope Sent",
+      "description": "Triggered when an envelope is sent to recipients",
+      "event": "envelope-sent"
+    },
+    {
+      "id": "on_envelope_delivered",
+      "name": "Envelope Delivered",
+      "description": "Triggered when an envelope is delivered to a recipient",
+      "event": "envelope-delivered"
+    },
+    {
+      "id": "on_envelope_completed",
+      "name": "Envelope Completed",
+      "description": "Triggered when all recipients have signed",
+      "event": "envelope-completed"
+    },
+    {
+      "id": "on_envelope_declined",
+      "name": "Envelope Declined",
+      "description": "Triggered when a recipient declines to sign",
+      "event": "envelope-declined"
+    },
+    {
+      "id": "on_envelope_voided",
+      "name": "Envelope Voided",
+      "description": "Triggered when an envelope is voided",
+      "event": "envelope-voided"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "x-docusign-signature-1",
+    "signatureAlgorithm": "hmac-sha256"
+  },
+  "mcp": {
+    "tools": [
+      {
+        "name": "docusign_send_for_signature",
+        "description": "Send a document for electronic signature",
+        "inputSchema": {
+          "type": "object",
+          "required": ["signer_email", "signer_name", "subject"],
+          "properties": {
+            "signer_email": { "type": "string", "description": "Email of the person to sign" },
+            "signer_name": { "type": "string", "description": "Name of the signer" },
+            "subject": { "type": "string", "description": "Email subject" },
+            "template_id": { "type": "string", "description": "Template ID to use" },
+            "document_base64": { "type": "string", "description": "Base64 encoded document" }
+          }
+        }
+      }
+    ]
+  }
+}

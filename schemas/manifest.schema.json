@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mramsay84/encompass-adapter-registry/schemas/manifest.schema.json",
+  "title": "Encompass Adapter Registry Manifest",
+  "description": "Schema for the master registry manifest file",
+  "type": "object",
+  "required": ["version", "name", "adapters"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Registry manifest version (semver)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Registry name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Registry description"
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Repository URL"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "categories": {
+      "type": "array",
+      "description": "Adapter categories",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Category identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category display name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Category description"
+          }
+        }
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "description": "List of available adapters",
+      "items": {
+        "type": "object",
+        "required": ["slug", "name", "version", "category", "path"],
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Unique adapter identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Adapter display name"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "description": "Adapter version (semver)"
+          },
+          "category": {
+            "type": "string",
+            "description": "Category ID"
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative path to adapter directory"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "testing", "active", "deprecated"],
+            "default": "active",
+            "description": "Adapter status"
+          },
+          "featured": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether the adapter is featured"
+          },
+          "minEncompassVersion": {
+            "type": "string",
+            "description": "Minimum Encompass platform version required"
+          }
+        }
+      }
+    }
+  }
+}

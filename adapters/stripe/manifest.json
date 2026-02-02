@@ -1,0 +1,344 @@
+{
+  "actions": [
+    {
+      "id": "create_customer",
+      "name": "Create Customer",
+      "description": "Create a new customer in Stripe",
+      "category": "customers",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email", "description": "Customer email" },
+          "name": { "type": "string", "description": "Customer full name" },
+          "phone": { "type": "string", "description": "Customer phone number" },
+          "description": { "type": "string", "description": "Internal description" },
+          "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "created": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "get_customer",
+      "name": "Get Customer",
+      "description": "Retrieve a customer by ID",
+      "category": "customers",
+      "configSchema": {
+        "type": "object",
+        "required": ["customer_id"],
+        "properties": {
+          "customer_id": { "type": "string", "description": "Stripe customer ID (cus_xxx)" }
+        }
+      }
+    },
+    {
+      "id": "update_customer",
+      "name": "Update Customer",
+      "description": "Update an existing customer",
+      "category": "customers",
+      "configSchema": {
+        "type": "object",
+        "required": ["customer_id"],
+        "properties": {
+          "customer_id": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "phone": { "type": "string" },
+          "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "delete_customer",
+      "name": "Delete Customer",
+      "description": "Permanently delete a customer",
+      "category": "customers",
+      "configSchema": {
+        "type": "object",
+        "required": ["customer_id"],
+        "properties": {
+          "customer_id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_customers",
+      "name": "List Customers",
+      "description": "List all customers with optional filtering",
+      "category": "customers",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "number", "minimum": 1, "maximum": 100, "default": 10 },
+          "email": { "type": "string" },
+          "starting_after": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_payment_intent",
+      "name": "Create Payment Intent",
+      "description": "Create a PaymentIntent to collect a payment",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["amount", "currency"],
+        "properties": {
+          "amount": { "type": "number", "minimum": 1, "description": "Amount in smallest currency unit (cents)" },
+          "currency": { "type": "string", "minLength": 3, "maxLength": 3 },
+          "customer": { "type": "string" },
+          "description": { "type": "string" },
+          "receipt_email": { "type": "string", "format": "email" },
+          "payment_method": { "type": "string" },
+          "confirm": { "type": "boolean" },
+          "capture_method": { "type": "string", "enum": ["automatic", "manual"] },
+          "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "client_secret": { "type": "string" },
+          "status": { "type": "string" },
+          "amount": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "get_payment_intent",
+      "name": "Get Payment Intent",
+      "description": "Retrieve a PaymentIntent by ID",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["payment_intent_id"],
+        "properties": {
+          "payment_intent_id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "confirm_payment_intent",
+      "name": "Confirm Payment Intent",
+      "description": "Confirm a PaymentIntent to process the payment",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["payment_intent_id"],
+        "properties": {
+          "payment_intent_id": { "type": "string" },
+          "payment_method": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "cancel_payment_intent",
+      "name": "Cancel Payment Intent",
+      "description": "Cancel a PaymentIntent",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["payment_intent_id"],
+        "properties": {
+          "payment_intent_id": { "type": "string" },
+          "cancellation_reason": { "type": "string", "enum": ["duplicate", "fraudulent", "requested_by_customer", "abandoned"] }
+        }
+      }
+    },
+    {
+      "id": "create_refund",
+      "name": "Create Refund",
+      "description": "Refund a payment or charge",
+      "category": "refunds",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "payment_intent": { "type": "string" },
+          "charge": { "type": "string" },
+          "amount": { "type": "number" },
+          "reason": { "type": "string", "enum": ["duplicate", "fraudulent", "requested_by_customer"] },
+          "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "create_subscription",
+      "name": "Create Subscription",
+      "description": "Create a new subscription for a customer",
+      "category": "subscriptions",
+      "configSchema": {
+        "type": "object",
+        "required": ["customer", "items"],
+        "properties": {
+          "customer": { "type": "string" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["price"],
+              "properties": {
+                "price": { "type": "string" },
+                "quantity": { "type": "number", "default": 1 }
+              }
+            }
+          },
+          "trial_period_days": { "type": "number" },
+          "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "cancel_subscription",
+      "name": "Cancel Subscription",
+      "description": "Cancel a subscription immediately or at period end",
+      "category": "subscriptions",
+      "configSchema": {
+        "type": "object",
+        "required": ["subscription_id"],
+        "properties": {
+          "subscription_id": { "type": "string" },
+          "cancel_at_period_end": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    {
+      "id": "create_invoice",
+      "name": "Create Invoice",
+      "description": "Create a draft invoice for a customer",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["customer"],
+        "properties": {
+          "customer": { "type": "string" },
+          "collection_method": { "type": "string", "enum": ["charge_automatically", "send_invoice"] },
+          "auto_advance": { "type": "boolean", "default": true },
+          "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "get_balance",
+      "name": "Get Balance",
+      "description": "Retrieve your Stripe account balance",
+      "category": "balance",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "payment_intent_succeeded",
+      "name": "Payment Intent Succeeded",
+      "description": "Triggered when a payment is successfully completed",
+      "event": "payment_intent.succeeded"
+    },
+    {
+      "id": "payment_intent_failed",
+      "name": "Payment Intent Failed",
+      "description": "Triggered when a payment attempt fails",
+      "event": "payment_intent.payment_failed"
+    },
+    {
+      "id": "customer_created",
+      "name": "Customer Created",
+      "description": "Triggered when a new customer is created",
+      "event": "customer.created"
+    },
+    {
+      "id": "customer_updated",
+      "name": "Customer Updated",
+      "description": "Triggered when a customer is updated",
+      "event": "customer.updated"
+    },
+    {
+      "id": "subscription_created",
+      "name": "Subscription Created",
+      "description": "Triggered when a new subscription is created",
+      "event": "customer.subscription.created"
+    },
+    {
+      "id": "subscription_updated",
+      "name": "Subscription Updated",
+      "description": "Triggered when a subscription is modified",
+      "event": "customer.subscription.updated"
+    },
+    {
+      "id": "subscription_deleted",
+      "name": "Subscription Deleted",
+      "description": "Triggered when a subscription is canceled",
+      "event": "customer.subscription.deleted"
+    },
+    {
+      "id": "invoice_paid",
+      "name": "Invoice Paid",
+      "description": "Triggered when an invoice is paid",
+      "event": "invoice.paid"
+    },
+    {
+      "id": "invoice_payment_failed",
+      "name": "Invoice Payment Failed",
+      "description": "Triggered when invoice payment fails",
+      "event": "invoice.payment_failed"
+    },
+    {
+      "id": "charge_refunded",
+      "name": "Charge Refunded",
+      "description": "Triggered when a charge is refunded",
+      "event": "charge.refunded"
+    },
+    {
+      "id": "charge_dispute_created",
+      "name": "Dispute Created",
+      "description": "Triggered when a dispute is opened",
+      "event": "charge.dispute.created"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "stripe-signature",
+    "signatureAlgorithm": "hmac-sha256"
+  },
+  "mcp": {
+    "tools": [
+      {
+        "name": "stripe_process_payment",
+        "description": "Process a payment for a customer. Looks up or creates customer, then creates and confirms a payment intent.",
+        "inputSchema": {
+          "type": "object",
+          "required": ["amount", "currency"],
+          "properties": {
+            "amount": { "type": "number", "description": "Amount in smallest currency unit" },
+            "currency": { "type": "string", "description": "Three-letter currency code" },
+            "customer_email": { "type": "string", "description": "Customer email for lookup/create" },
+            "customer_name": { "type": "string", "description": "Customer name" },
+            "description": { "type": "string", "description": "Payment description" }
+          }
+        }
+      },
+      {
+        "name": "stripe_refund_payment",
+        "description": "Refund a payment by payment intent ID or customer email",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "payment_intent_id": { "type": "string", "description": "Payment intent ID to refund" },
+            "customer_email": { "type": "string", "description": "Customer email to find last payment" },
+            "amount": { "type": "number", "description": "Amount to refund (omit for full)" },
+            "reason": { "type": "string", "description": "Refund reason" }
+          }
+        }
+      }
+    ]
+  }
+}

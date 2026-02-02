@@ -1,0 +1,41 @@
+{
+  "$schema": "../../schemas/adapter.schema.json",
+  "slug": "docusign",
+  "name": "DocuSign",
+  "version": "1.0.0",
+  "description": "Send documents for electronic signature, track envelope status, and automate contract workflows with DocuSign.",
+  "type": "esignature",
+  "provider": {
+    "name": "DocuSign",
+    "website": "https://www.docusign.com",
+    "documentation": "https://developers.docusign.com/docs/esign-rest-api/"
+  },
+  "authentication": {
+    "type": "oauth2",
+    "fields": [
+      {
+        "name": "account_id",
+        "label": "Account ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "helpText": "Your DocuSign Account ID (GUID). Find in DocuSign Admin → API and Keys."
+      }
+    ],
+    "oauth2": {
+      "authUrl": "https://account-d.docusign.com/oauth/auth",
+      "tokenUrl": "https://account-d.docusign.com/oauth/token",
+      "scopes": ["signature", "impersonation"],
+      "pkce": false
+    },
+    "testEndpoint": "/accounts/{account_id}"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 1000
+  },
+  "icon": "docusign",
+  "tags": ["esignature", "documents", "contracts", "signing", "legal"],
+  "aiDescription": "DocuSign adapter for electronic signatures. Create and send envelopes, manage templates, track signing status, and download completed documents.",
+  "aiInstructions": "When helping users with DocuSign:\n- To send for signature: use create_envelope with templateId or documents\n- Recipients are specified in the recipients object with signers/carbonCopies\n- Use status \"sent\" to send immediately, \"created\" for draft\n- Check envelope status with get_envelope\n- Download signed docs with get_document (use \"combined\" for all merged)\n- For templates, list with list_templates then reference by templateId",
+  "setupInstructions": "## Setting up DocuSign\n\n1. **Create a DocuSign Developer Account**\n   - Go to [DocuSign Developer Center](https://developers.docusign.com/)\n   - Sign up for a free developer account\n\n2. **Create an Integration Key**\n   - Go to Apps and Keys in your developer account\n   - Click \"Add App and Integration Key\"\n   - Note your Integration Key (Client ID)\n   - Add a redirect URI for OAuth callback\n\n3. **Get Your Account ID**\n   - Your Account ID (GUID) is shown in Apps and Keys"
+}

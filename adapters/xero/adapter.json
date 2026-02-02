@@ -1,0 +1,41 @@
+{
+  "$schema": "../../schemas/adapter.schema.json",
+  "slug": "xero",
+  "name": "Xero",
+  "version": "1.0.0",
+  "description": "SMB accounting integration for managing contacts, invoices, payments, and chart of accounts.",
+  "type": "crm",
+  "provider": {
+    "name": "Xero",
+    "website": "https://www.xero.com",
+    "documentation": "https://developer.xero.com/documentation"
+  },
+  "authentication": {
+    "type": "oauth2",
+    "fields": [
+      {
+        "name": "tenant_id",
+        "label": "Tenant ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "helpText": "Your Xero Tenant ID (organisation). Obtained after OAuth authorization."
+      }
+    ],
+    "oauth2": {
+      "authUrl": "https://login.xero.com/identity/connect/authorize",
+      "tokenUrl": "https://identity.xero.com/connect/token",
+      "scopes": ["accounting.transactions", "accounting.contacts", "accounting.settings"],
+      "pkce": true
+    },
+    "testEndpoint": "/api.xro/2.0/Organisation"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 60
+  },
+  "icon": "xero",
+  "tags": ["accounting", "invoicing", "crm", "finance", "payments"],
+  "aiDescription": "Xero accounting adapter for SMB financial data. Create contacts, generate invoices, record payments, and sync chart of accounts.",
+  "aiInstructions": "When helping users with Xero:\n- For sales invoices, use type \"ACCREC\"\n- For purchase bills, use type \"ACCPAY\"\n- Always create contacts first before creating invoices for them\n- Use list_accounts to find valid account codes for line items\n- When recording payments, you need both invoiceId and a bank accountId\n- Xero IDs are GUIDs like \"00000000-0000-0000-0000-000000000000\"",
+  "setupInstructions": "## Setting up Xero\n\n1. **Create a Xero Developer Account**\n   - Go to [Xero Developer Portal](https://developer.xero.com/)\n   - Create a new app\n\n2. **Configure OAuth2**\n   - Set your redirect URI in the app settings\n   - Copy your Client ID and Client Secret\n\n3. **Get Tenant ID**\n   - After OAuth authorization, you'll receive access to tenant IDs\n   - Each tenant represents a Xero organisation\n\n4. **Required Scopes**\n   - accounting.transactions - Read/write invoices & payments\n   - accounting.contacts - Read/write customer & supplier data\n   - accounting.settings - Read chart of accounts"
+}

@@ -1,0 +1,194 @@
+{
+  "actions": [
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Create a new contact (customer or supplier)",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "description": "Contact name" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "emailAddress": { "type": "string" },
+          "phones": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "phoneType": { "type": "string", "enum": ["DEFAULT", "DDI", "MOBILE", "FAX"] },
+                "phoneNumber": { "type": "string" }
+              }
+            }
+          },
+          "isCustomer": { "type": "boolean", "default": true },
+          "isSupplier": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    {
+      "id": "get_contact",
+      "name": "Get Contact",
+      "description": "Get contact details by ID",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["contactId"],
+        "properties": {
+          "contactId": { "type": "string", "description": "Xero contact ID (GUID)" }
+        }
+      }
+    },
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "List contacts with optional filtering",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string", "description": "Xero OData filter expression" },
+          "page": { "type": "number", "default": 1 }
+        }
+      }
+    },
+    {
+      "id": "create_invoice",
+      "name": "Create Invoice",
+      "description": "Create a sales invoice (ACCREC) or purchase bill (ACCPAY)",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["type", "contactId", "lineItems"],
+        "properties": {
+          "type": { "type": "string", "enum": ["ACCREC", "ACCPAY"], "description": "ACCREC for sales, ACCPAY for purchases" },
+          "contactId": { "type": "string", "description": "Contact ID (GUID)" },
+          "lineItems": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "description": { "type": "string" },
+                "quantity": { "type": "number" },
+                "unitAmount": { "type": "number" },
+                "accountCode": { "type": "string" },
+                "taxType": { "type": "string" }
+              }
+            }
+          },
+          "date": { "type": "string", "description": "Invoice date (YYYY-MM-DD)" },
+          "dueDate": { "type": "string", "description": "Due date (YYYY-MM-DD)" },
+          "reference": { "type": "string" },
+          "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED", "AUTHORISED"], "default": "DRAFT" }
+        }
+      }
+    },
+    {
+      "id": "get_invoice",
+      "name": "Get Invoice",
+      "description": "Get invoice details by ID",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId"],
+        "properties": {
+          "invoiceId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_invoices",
+      "name": "List Invoices",
+      "description": "List invoices with optional filtering",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string", "description": "Xero OData filter" },
+          "page": { "type": "number", "default": 1 },
+          "statuses": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "create_payment",
+      "name": "Create Payment",
+      "description": "Record a payment against an invoice",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId", "accountId", "amount"],
+        "properties": {
+          "invoiceId": { "type": "string" },
+          "accountId": { "type": "string", "description": "Bank account ID" },
+          "amount": { "type": "number" },
+          "date": { "type": "string", "description": "Payment date (YYYY-MM-DD)" },
+          "reference": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_accounts",
+      "name": "List Accounts",
+      "description": "List chart of accounts",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string", "description": "Xero OData filter" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "on_invoice_created",
+      "name": "Invoice Created",
+      "description": "Triggered when an invoice is created",
+      "event": "INVOICE.CREATE"
+    },
+    {
+      "id": "on_invoice_updated",
+      "name": "Invoice Updated",
+      "description": "Triggered when an invoice is updated",
+      "event": "INVOICE.UPDATE"
+    },
+    {
+      "id": "on_contact_created",
+      "name": "Contact Created",
+      "description": "Triggered when a contact is created",
+      "event": "CONTACT.CREATE"
+    },
+    {
+      "id": "on_payment_created",
+      "name": "Payment Created",
+      "description": "Triggered when a payment is recorded",
+      "event": "PAYMENT.CREATE"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "x-xero-signature",
+    "signatureAlgorithm": "hmac-sha256"
+  },
+  "mcp": {
+    "tools": [
+      {
+        "name": "xero_create_invoice",
+        "description": "Create a sales invoice in Xero",
+        "inputSchema": {
+          "type": "object",
+          "required": ["contact_name", "description", "amount"],
+          "properties": {
+            "contact_name": { "type": "string", "description": "Customer name" },
+            "description": { "type": "string", "description": "Invoice line description" },
+            "amount": { "type": "number", "description": "Invoice amount" },
+            "due_date": { "type": "string", "description": "Due date (YYYY-MM-DD)" }
+          }
+        }
+      }
+    ]
+  }
+}

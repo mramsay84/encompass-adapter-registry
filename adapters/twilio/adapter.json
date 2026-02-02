@@ -1,0 +1,51 @@
+{
+  "$schema": "../../schemas/adapter.schema.json",
+  "slug": "twilio",
+  "name": "Twilio",
+  "version": "1.0.0",
+  "description": "Send SMS, WhatsApp messages, and make voice calls. Includes phone number lookup and call recordings.",
+  "type": "sms",
+  "provider": {
+    "name": "Twilio",
+    "website": "https://www.twilio.com",
+    "documentation": "https://www.twilio.com/docs/usage/api"
+  },
+  "authentication": {
+    "type": "basic",
+    "fields": [
+      {
+        "name": "account_sid",
+        "label": "Account SID",
+        "type": "text",
+        "required": true,
+        "placeholder": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "helpText": "Your Twilio Account SID. Find in Console Dashboard."
+      },
+      {
+        "name": "auth_token",
+        "label": "Auth Token",
+        "type": "password",
+        "required": true,
+        "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "helpText": "Your Twilio Auth Token. Keep this secret!"
+      },
+      {
+        "name": "default_from",
+        "label": "Default From Number",
+        "type": "text",
+        "required": false,
+        "placeholder": "+1234567890",
+        "helpText": "Default phone number or WhatsApp sender to use."
+      }
+    ],
+    "testEndpoint": "/Account.json"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 100
+  },
+  "icon": "twilio",
+  "tags": ["sms", "whatsapp", "voice", "communication", "messaging"],
+  "aiDescription": "Twilio adapter for SMS, WhatsApp, and voice calls. Send messages, make outbound calls, get recordings, and lookup phone number information.",
+  "aiInstructions": "When helping users with Twilio:\n- For SMS: use send_sms with to (E.164 format like +1234567890) and body\n- For WhatsApp: use send_whatsapp, numbers must be whatsapp:+1234567890 format\n- For calls: make_call requires a url with TwiML or inline twiml\n- Phone lookup: use lookup_phone for carrier/line type info\n- Messages have a 1600 character limit for SMS",
+  "setupInstructions": "## Setting up Twilio\n\n1. **Create a Twilio Account**\n   - Go to [Twilio](https://www.twilio.com/) and sign up\n\n2. **Get Your Credentials**\n   - Go to the Console Dashboard\n   - Copy your Account SID and Auth Token\n\n3. **Get a Phone Number**\n   - Go to Phone Numbers → Manage → Buy a number\n   - Choose a number with SMS and/or Voice capabilities"
+}

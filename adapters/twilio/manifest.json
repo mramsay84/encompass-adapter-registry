@@ -1,0 +1,160 @@
+{
+  "actions": [
+    {
+      "id": "send_sms",
+      "name": "Send SMS",
+      "description": "Send an SMS message to a phone number",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "body"],
+        "properties": {
+          "to": { "type": "string", "description": "Recipient phone number in E.164 format (+1234567890)" },
+          "from": { "type": "string", "description": "Sender phone number (uses default if not specified)" },
+          "body": { "type": "string", "description": "Message text (max 1600 characters)" },
+          "mediaUrl": { "type": "array", "items": { "type": "string" }, "description": "URLs of media to include (MMS)" }
+        }
+      }
+    },
+    {
+      "id": "send_whatsapp",
+      "name": "Send WhatsApp Message",
+      "description": "Send a WhatsApp message (requires approved template for new conversations)",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "required": ["to"],
+        "properties": {
+          "to": { "type": "string", "description": "Recipient WhatsApp number in format 'whatsapp:+1234567890'" },
+          "from": { "type": "string", "description": "Sender WhatsApp number" },
+          "body": { "type": "string", "description": "Message text" },
+          "contentSid": { "type": "string", "description": "Content template SID for templated messages" },
+          "contentVariables": { "type": "object", "description": "Variables to substitute in template" }
+        }
+      }
+    },
+    {
+      "id": "get_message",
+      "name": "Get Message",
+      "description": "Get details of a specific message",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "required": ["messageSid"],
+        "properties": {
+          "messageSid": { "type": "string", "description": "Message SID (SMxxx)" }
+        }
+      }
+    },
+    {
+      "id": "make_call",
+      "name": "Make Call",
+      "description": "Initiate an outbound voice call",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "from"],
+        "properties": {
+          "to": { "type": "string", "description": "Number to call in E.164 format" },
+          "from": { "type": "string", "description": "Caller ID (must be a Twilio number)" },
+          "url": { "type": "string", "description": "URL for TwiML instructions when call connects" },
+          "twiml": { "type": "string", "description": "Inline TwiML (alternative to url)" },
+          "record": { "type": "boolean", "default": false, "description": "Record the call" },
+          "timeout": { "type": "number", "default": 60, "description": "Seconds to wait for answer" }
+        }
+      }
+    },
+    {
+      "id": "get_call",
+      "name": "Get Call",
+      "description": "Get details of a specific call",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["callSid"],
+        "properties": {
+          "callSid": { "type": "string", "description": "Call SID (CAxxx)" }
+        }
+      }
+    },
+    {
+      "id": "lookup_phone",
+      "name": "Lookup Phone Number",
+      "description": "Get carrier and line type information for a phone number",
+      "category": "lookup",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumber"],
+        "properties": {
+          "phoneNumber": { "type": "string", "description": "Phone number in E.164 format" },
+          "fields": { "type": "array", "items": { "type": "string" }, "description": "Data fields to include" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "on_message_received",
+      "name": "Message Received",
+      "description": "Triggered when an SMS or WhatsApp message is received",
+      "event": "message.received"
+    },
+    {
+      "id": "on_message_delivered",
+      "name": "Message Delivered",
+      "description": "Triggered when a message is successfully delivered",
+      "event": "message.delivered"
+    },
+    {
+      "id": "on_message_failed",
+      "name": "Message Failed",
+      "description": "Triggered when a message fails to send",
+      "event": "message.failed"
+    },
+    {
+      "id": "on_call_completed",
+      "name": "Call Completed",
+      "description": "Triggered when a call ends",
+      "event": "call.completed"
+    },
+    {
+      "id": "on_recording_completed",
+      "name": "Recording Completed",
+      "description": "Triggered when a call recording is ready",
+      "event": "recording.completed"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "x-twilio-signature",
+    "signatureAlgorithm": "hmac-sha1"
+  },
+  "mcp": {
+    "tools": [
+      {
+        "name": "twilio_send_sms",
+        "description": "Send an SMS message to a phone number",
+        "inputSchema": {
+          "type": "object",
+          "required": ["to", "message"],
+          "properties": {
+            "to": { "type": "string", "description": "Recipient phone number (+1234567890)" },
+            "message": { "type": "string", "description": "Message to send" }
+          }
+        }
+      },
+      {
+        "name": "twilio_send_whatsapp",
+        "description": "Send a WhatsApp message",
+        "inputSchema": {
+          "type": "object",
+          "required": ["to", "message"],
+          "properties": {
+            "to": { "type": "string", "description": "Recipient WhatsApp number" },
+            "message": { "type": "string", "description": "Message to send" }
+          }
+        }
+      }
+    ]
+  }
+}

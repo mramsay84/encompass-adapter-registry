@@ -1,0 +1,116 @@
+{
+  "$schema": "./schemas/manifest.schema.json",
+  "version": "1.0.0",
+  "name": "Encompass Adapter Registry",
+  "description": "Official registry of system adapters for the Encompass platform",
+  "repository": "https://github.com/mramsay84/encompass-adapter-registry",
+  "lastUpdated": "2026-02-02T00:00:00Z",
+  "categories": [
+    {
+      "id": "payment",
+      "name": "Payment Processing",
+      "description": "Process payments, subscriptions, and invoices"
+    },
+    {
+      "id": "email",
+      "name": "Email Services",
+      "description": "Send transactional and marketing emails"
+    },
+    {
+      "id": "sms",
+      "name": "SMS & Communication",
+      "description": "Send SMS, voice calls, and other communications"
+    },
+    {
+      "id": "esignature",
+      "name": "Electronic Signatures",
+      "description": "Send documents for electronic signature"
+    },
+    {
+      "id": "kyc",
+      "name": "Identity Verification",
+      "description": "Verify customer identity and compliance"
+    },
+    {
+      "id": "crm",
+      "name": "CRM & Accounting",
+      "description": "Customer relationship management and accounting"
+    },
+    {
+      "id": "storage",
+      "name": "File Storage",
+      "description": "Store and manage files in the cloud"
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar & Scheduling",
+      "description": "Manage calendars and appointments"
+    },
+    {
+      "id": "communication",
+      "name": "Team Communication",
+      "description": "Slack, Teams, and other messaging platforms"
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics & Tracking",
+      "description": "Track events and analyze user behavior"
+    }
+  ],
+  "adapters": [
+    {
+      "slug": "stripe",
+      "name": "Stripe",
+      "version": "1.0.0",
+      "category": "payment",
+      "path": "adapters/stripe",
+      "status": "active",
+      "featured": true
+    },
+    {
+      "slug": "sendgrid",
+      "name": "SendGrid",
+      "version": "1.0.0",
+      "category": "email",
+      "path": "adapters/sendgrid",
+      "status": "active",
+      "featured": true
+    },
+    {
+      "slug": "twilio",
+      "name": "Twilio",
+      "version": "1.0.0",
+      "category": "sms",
+      "path": "adapters/twilio",
+      "status": "active",
+      "featured": true
+    },
+    {
+      "slug": "docusign",
+      "name": "DocuSign",
+      "version": "1.0.0",
+      "category": "esignature",
+      "path": "adapters/docusign",
+      "status": "active",
+      "featured": true
+    },
+    {
+      "slug": "sumsub",
+      "name": "SumSub",
+      "version": "1.0.0",
+      "category": "kyc",
+      "path": "adapters/sumsub",
+      "status": "active",
+      "featured": false
+    },
+    {
+      "slug": "xero",
+      "name": "Xero",
+      "version": "1.0.0",
+      "category": "crm",
+      "path": "adapters/xero",
+      "status": "active",
+      "featured": false
+    }
+  ]
+}

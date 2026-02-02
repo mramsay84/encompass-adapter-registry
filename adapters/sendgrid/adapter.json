@@ -1,0 +1,51 @@
+{
+  "$schema": "../../schemas/adapter.schema.json",
+  "slug": "sendgrid",
+  "name": "SendGrid",
+  "version": "1.0.0",
+  "description": "Send transactional emails, use dynamic templates, manage contacts, and track email engagement.",
+  "type": "email",
+  "provider": {
+    "name": "Twilio SendGrid",
+    "website": "https://sendgrid.com",
+    "documentation": "https://docs.sendgrid.com/api-reference/how-to-use-the-sendgrid-v3-api"
+  },
+  "authentication": {
+    "type": "api_key",
+    "fields": [
+      {
+        "name": "api_key",
+        "label": "API Key",
+        "type": "password",
+        "required": true,
+        "placeholder": "SG.xxxxxxxxxxxxxxxxxxxxxxxx",
+        "helpText": "SendGrid API key with Mail Send and other required permissions."
+      },
+      {
+        "name": "default_from",
+        "label": "Default From Email",
+        "type": "text",
+        "required": false,
+        "placeholder": "noreply@yourdomain.com",
+        "helpText": "Default sender email address."
+      },
+      {
+        "name": "default_from_name",
+        "label": "Default From Name",
+        "type": "text",
+        "required": false,
+        "placeholder": "Your Company",
+        "helpText": "Default sender display name."
+      }
+    ],
+    "testEndpoint": "/v3/user/profile"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 600
+  },
+  "icon": "sendgrid",
+  "tags": ["email", "transactional", "templates", "marketing", "contacts"],
+  "aiDescription": "SendGrid adapter for transactional email. Send plain/HTML emails or use dynamic templates. Manage marketing contacts and track email engagement.",
+  "aiInstructions": "When helping users with SendGrid:\n- To send email: use send_email with to, subject, and html or text\n- For templates: find template ID with list_templates, then use send_template_email\n- Template IDs start with \"d-\" followed by 32 hex characters\n- Dynamic template data uses Handlebars syntax: {{variable_name}}\n- If email fails, check that sender is verified and API key has Mail Send permission",
+  "setupInstructions": "## Setting up SendGrid\n\n1. **Create a SendGrid Account**\n   - Go to [SendGrid](https://sendgrid.com/) and sign up\n   - Verify your account and complete sender authentication\n\n2. **Create an API Key**\n   - Go to Settings → API Keys → Create API Key\n   - Select \"Restricted Access\" and enable Mail Send\n   - Copy your API key immediately\n\n3. **Verify a Sender**\n   - Go to Settings → Sender Authentication\n   - Either verify a single sender email or authenticate your domain"
+}
