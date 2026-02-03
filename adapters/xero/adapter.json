@@ -2,9 +2,10 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "xero",
   "name": "Xero",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "SMB accounting integration for managing contacts, invoices, payments, and chart of accounts.",
   "type": "crm",
+  "base_url": "https://api.xero.com",
   "provider": {
     "name": "Xero",
     "website": "https://www.xero.com",
@@ -36,14 +37,6 @@
         "type": "password",
         "required": true,
         "helpText": "Generated in Xero Developer Portal"
-      },
-      {
-        "name": "redirect_uri",
-        "label": "OAuth Redirect URI",
-        "type": "url",
-        "required": true,
-        "helpText": "Must match exactly what's registered in Xero Developer Portal",
-        "placeholder": "https://your-domain.com/api/oauth/callback"
       }
     ],
     "oauth2": {

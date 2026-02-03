@@ -2,9 +2,10 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "docusign",
   "name": "DocuSign",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Send documents for electronic signature, track envelope status, and automate contract workflows with DocuSign.",
   "type": "esignature",
+  "base_url": "https://demo.docusign.net/restapi",
   "provider": {
     "name": "DocuSign",
     "website": "https://www.docusign.com",
@@ -36,14 +37,6 @@
         "type": "password",
         "required": true,
         "helpText": "Generated in DocuSign app settings"
-      },
-      {
-        "name": "redirect_uri",
-        "label": "OAuth Redirect URI",
-        "type": "url",
-        "required": true,
-        "helpText": "Must match exactly what's registered in DocuSign",
-        "placeholder": "https://your-domain.com/api/oauth/callback"
       }
     ],
     "oauth2": {
