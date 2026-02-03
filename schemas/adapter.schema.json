@@ -68,41 +68,16 @@
         },
         "fields": {
           "type": "array",
-          "description": "Credential fields required for authentication",
+          "description": "User-facing credential fields (e.g., tenant_id for org users)",
           "items": {
-            "type": "object",
-            "required": ["name", "label", "type", "required"],
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "Field identifier"
-              },
-              "label": {
-                "type": "string",
-                "description": "Display label"
-              },
-              "type": {
-                "type": "string",
-                "enum": ["text", "password", "url", "email", "textarea"],
-                "description": "Input field type"
-              },
-              "required": {
-                "type": "boolean",
-                "description": "Whether the field is required"
-              },
-              "placeholder": {
-                "type": "string",
-                "description": "Placeholder text"
-              },
-              "helpText": {
-                "type": "string",
-                "description": "Help text for the field"
-              },
-              "defaultValue": {
-                "type": "string",
-                "description": "Default value"
-              }
-            }
+            "$ref": "#/$defs/authField"
+          }
+        },
+        "oauth_app_fields": {
+          "type": "array",
+          "description": "OAuth app credential fields for super admin (client_id, client_secret, redirect_uri)",
+          "items": {
+            "$ref": "#/$defs/authField"
           }
         },
         "oauth2": {
@@ -174,6 +149,43 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Searchable tags"
+    }
+  },
+  "$defs": {
+    "authField": {
+      "type": "object",
+      "required": ["name", "label", "type", "required"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Field identifier"
+        },
+        "label": {
+          "type": "string",
+          "description": "Display label"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text", "password", "url", "email", "textarea"],
+          "description": "Input field type"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the field is required"
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Placeholder text"
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text for the field"
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Default value"
+        }
+      }
     }
   }
 }

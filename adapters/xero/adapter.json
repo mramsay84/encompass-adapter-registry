@@ -22,10 +22,34 @@
         "helpText": "Your Xero Tenant ID (organisation). Obtained after OAuth authorization."
       }
     ],
+    "oauth_app_fields": [
+      {
+        "name": "client_id",
+        "label": "Client ID",
+        "type": "text",
+        "required": true,
+        "helpText": "From Xero Developer Portal app settings"
+      },
+      {
+        "name": "client_secret",
+        "label": "Client Secret",
+        "type": "password",
+        "required": true,
+        "helpText": "Generated in Xero Developer Portal"
+      },
+      {
+        "name": "redirect_uri",
+        "label": "OAuth Redirect URI",
+        "type": "url",
+        "required": true,
+        "helpText": "Must match exactly what's registered in Xero Developer Portal",
+        "placeholder": "https://your-domain.com/api/oauth/callback"
+      }
+    ],
     "oauth2": {
       "authUrl": "https://login.xero.com/identity/connect/authorize",
       "tokenUrl": "https://identity.xero.com/connect/token",
-      "scopes": ["accounting.transactions", "accounting.contacts", "accounting.settings"],
+      "scopes": ["openid", "profile", "email", "offline_access", "accounting.transactions", "accounting.contacts", "accounting.settings"],
       "pkce": true
     },
     "testEndpoint": "/api.xro/2.0/Organisation"

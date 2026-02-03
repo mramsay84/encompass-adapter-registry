@@ -22,6 +22,30 @@
         "helpText": "Your DocuSign Account ID (GUID). Find in DocuSign Admin → API and Keys."
       }
     ],
+    "oauth_app_fields": [
+      {
+        "name": "client_id",
+        "label": "Integration Key (Client ID)",
+        "type": "text",
+        "required": true,
+        "helpText": "From DocuSign Apps and Keys settings"
+      },
+      {
+        "name": "client_secret",
+        "label": "Secret Key",
+        "type": "password",
+        "required": true,
+        "helpText": "Generated in DocuSign app settings"
+      },
+      {
+        "name": "redirect_uri",
+        "label": "OAuth Redirect URI",
+        "type": "url",
+        "required": true,
+        "helpText": "Must match exactly what's registered in DocuSign",
+        "placeholder": "https://your-domain.com/api/oauth/callback"
+      }
+    ],
     "oauth2": {
       "authUrl": "https://account-d.docusign.com/oauth/auth",
       "tokenUrl": "https://account-d.docusign.com/oauth/token",
