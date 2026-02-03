@@ -4,7 +4,7 @@
       "id": "send_email",
       "name": "Send Email",
       "description": "Send a transactional email with text and/or HTML content",
-      "category": "email",
+      "category": "mail_send",
       "configSchema": {
         "type": "object",
         "required": ["to", "subject"],
@@ -23,10 +23,55 @@
       }
     },
     {
+      "id": "send_bulk_email",
+      "name": "Send Bulk Email",
+      "description": "Send emails to multiple recipients with personalization",
+      "category": "mail_send",
+      "configSchema": {
+        "type": "object",
+        "required": ["personalizations"],
+        "properties": {
+          "personalizations": { "type": "array", "description": "Array of recipient personalizations" },
+          "from": { "type": "string" },
+          "subject": { "type": "string" },
+          "content": { "type": "array" }
+        }
+      }
+    },
+    {
+      "id": "schedule_email",
+      "name": "Schedule Email",
+      "description": "Schedule an email for future delivery",
+      "category": "mail_send",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "subject", "sendAt"],
+        "properties": {
+          "to": { "type": "string" },
+          "subject": { "type": "string" },
+          "content": { "type": "string" },
+          "sendAt": { "type": "integer", "description": "Unix timestamp for scheduled delivery" }
+        }
+      }
+    },
+    {
+      "id": "cancel_scheduled_email",
+      "name": "Cancel Scheduled Email",
+      "description": "Cancel a scheduled email before it sends",
+      "category": "mail_send",
+      "configSchema": {
+        "type": "object",
+        "required": ["batchId"],
+        "properties": {
+          "batchId": { "type": "string", "description": "Batch ID of scheduled emails" }
+        }
+      }
+    },
+    {
       "id": "send_template_email",
       "name": "Send Template Email",
       "description": "Send an email using a dynamic template",
-      "category": "email",
+      "category": "mail_send",
       "configSchema": {
         "type": "object",
         "required": ["to", "templateId"],
@@ -42,22 +87,9 @@
       }
     },
     {
-      "id": "list_templates",
-      "name": "List Templates",
-      "description": "List all dynamic templates",
-      "category": "templates",
-      "configSchema": {
-        "type": "object",
-        "properties": {
-          "generations": { "type": "string", "enum": ["legacy", "dynamic", "legacy,dynamic"], "default": "dynamic" },
-          "pageSize": { "type": "number", "default": 10 }
-        }
-      }
-    },
-    {
       "id": "create_contact",
-      "name": "Create/Update Contact",
-      "description": "Add or update a contact in your marketing list",
+      "name": "Create Contact",
+      "description": "Add a new contact to marketing campaigns",
       "category": "contacts",
       "configSchema": {
         "type": "object",
@@ -73,50 +105,1290 @@
       }
     },
     {
-      "id": "get_stats",
-      "name": "Get Email Statistics",
-      "description": "Get aggregate email statistics",
-      "category": "analytics",
+      "id": "update_contact",
+      "name": "Update Contact",
+      "description": "Update an existing contact's information",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "phoneNumber": { "type": "string" },
+          "customFields": { "type": "object" }
+        }
+      }
+    },
+    {
+      "id": "delete_contact",
+      "name": "Delete Contact",
+      "description": "Remove a contact from the system",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["ids"],
+        "properties": {
+          "ids": { "type": "array", "items": { "type": "string" }, "description": "Contact IDs to delete" },
+          "deleteAllContacts": { "type": "boolean", "description": "Delete all contacts" }
+        }
+      }
+    },
+    {
+      "id": "get_contact",
+      "name": "Get Contact",
+      "description": "Retrieve contact details by ID or email",
+      "category": "contacts",
       "configSchema": {
         "type": "object",
         "properties": {
-          "startDate": { "type": "string", "description": "Start date (YYYY-MM-DD)" },
-          "endDate": { "type": "string", "description": "End date (YYYY-MM-DD)" },
-          "aggregatedBy": { "type": "string", "enum": ["day", "week", "month"], "default": "day" }
+          "id": { "type": "string", "description": "Contact ID" },
+          "email": { "type": "string", "description": "Contact email" }
         }
       }
+    },
+    {
+      "id": "search_contacts",
+      "name": "Search Contacts",
+      "description": "Search contacts by various criteria using SGQL",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["query"],
+        "properties": {
+          "query": { "type": "string", "description": "SGQL query string" }
+        }
+      }
+    },
+    {
+      "id": "import_contacts",
+      "name": "Import Contacts",
+      "description": "Bulk import contacts from JSON",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["contacts"],
+        "properties": {
+          "contacts": { "type": "array", "description": "Array of contact objects" },
+          "listIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "export_contacts",
+      "name": "Export Contacts",
+      "description": "Export contacts to CSV",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "listIds": { "type": "array", "items": { "type": "string" } },
+          "segmentIds": { "type": "array", "items": { "type": "string" } },
+          "fileType": { "type": "string", "enum": ["csv", "json"] }
+        }
+      }
+    },
+    {
+      "id": "get_contact_count",
+      "name": "Get Contact Count",
+      "description": "Get total number of contacts",
+      "category": "contacts",
+      "configSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "id": "create_list",
+      "name": "Create List",
+      "description": "Create a new contact list",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "description": "List name" }
+        }
+      }
+    },
+    {
+      "id": "update_list",
+      "name": "Update List",
+      "description": "Update list name",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_list",
+      "name": "Delete List",
+      "description": "Delete a contact list",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "deleteContacts": { "type": "boolean", "description": "Also delete contacts in list" }
+        }
+      }
+    },
+    {
+      "id": "get_list",
+      "name": "Get List",
+      "description": "Get list details",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_all_lists",
+      "name": "Get All Lists",
+      "description": "Retrieve all contact lists",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "pageSize": { "type": "number" },
+          "pageToken": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_contacts_to_list",
+      "name": "Add Contacts to List",
+      "description": "Add contacts to a specific list",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "required": ["listId", "contactIds"],
+        "properties": {
+          "listId": { "type": "string" },
+          "contactIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "remove_contacts_from_list",
+      "name": "Remove Contacts from List",
+      "description": "Remove contacts from a list",
+      "category": "lists",
+      "configSchema": {
+        "type": "object",
+        "required": ["listId", "contactIds"],
+        "properties": {
+          "listId": { "type": "string" },
+          "contactIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "create_segment",
+      "name": "Create Segment",
+      "description": "Create a dynamic segment based on conditions",
+      "category": "segments",
+      "configSchema": {
+        "type": "object",
+        "required": ["name", "queryDsl"],
+        "properties": {
+          "name": { "type": "string" },
+          "queryDsl": { "type": "string", "description": "SGQL query for segment" },
+          "parentListIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "update_segment",
+      "name": "Update Segment",
+      "description": "Update segment conditions",
+      "category": "segments",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "queryDsl": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_segment",
+      "name": "Delete Segment",
+      "description": "Delete a segment",
+      "category": "segments",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_segment",
+      "name": "Get Segment",
+      "description": "Get segment details and contacts",
+      "category": "segments",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "contactsSample": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_all_segments",
+      "name": "Get All Segments",
+      "description": "List all segments",
+      "category": "segments",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "parentListIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "create_single_send",
+      "name": "Create Single Send",
+      "description": "Create a one-time marketing campaign",
+      "category": "campaigns",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "sendTo": { "type": "object", "description": "List/segment IDs to send to" },
+          "emailConfig": { "type": "object", "description": "Email configuration" }
+        }
+      }
+    },
+    {
+      "id": "update_single_send",
+      "name": "Update Single Send",
+      "description": "Update a draft single send",
+      "category": "campaigns",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "sendTo": { "type": "object" },
+          "emailConfig": { "type": "object" }
+        }
+      }
+    },
+    {
+      "id": "delete_single_send",
+      "name": "Delete Single Send",
+      "description": "Delete a single send campaign",
+      "category": "campaigns",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "schedule_single_send",
+      "name": "Schedule Single Send",
+      "description": "Schedule a single send for delivery",
+      "category": "campaigns",
+      "configSchema": {
+        "type": "object",
+        "required": ["id", "sendAt"],
+        "properties": {
+          "id": { "type": "string" },
+          "sendAt": { "type": "string", "description": "ISO 8601 datetime" }
+        }
+      }
+    },
+    {
+      "id": "get_single_send",
+      "name": "Get Single Send",
+      "description": "Get single send details",
+      "category": "campaigns",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_all_single_sends",
+      "name": "Get All Single Sends",
+      "description": "List all single send campaigns",
+      "category": "campaigns",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "create_automation",
+      "name": "Create Automation",
+      "description": "Create an email automation workflow",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "steps": { "type": "array" }
+        }
+      }
+    },
+    {
+      "id": "update_automation",
+      "name": "Update Automation",
+      "description": "Update automation settings",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_automation",
+      "name": "Delete Automation",
+      "description": "Delete an automation",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "pause_automation",
+      "name": "Pause Automation",
+      "description": "Pause a running automation",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "resume_automation",
+      "name": "Resume Automation",
+      "description": "Resume a paused automation",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_automation",
+      "name": "Get Automation",
+      "description": "Get automation details",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_automation_stats",
+      "name": "Get Automation Stats",
+      "description": "Get automation performance statistics",
+      "category": "automations",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "aggregatedBy": { "type": "string", "enum": ["day", "week", "month"] }
+        }
+      }
+    },
+    {
+      "id": "create_template",
+      "name": "Create Template",
+      "description": "Create a dynamic email template",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "generation": { "type": "string", "enum": ["legacy", "dynamic"], "default": "dynamic" }
+        }
+      }
+    },
+    {
+      "id": "update_template",
+      "name": "Update Template",
+      "description": "Update template name",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["templateId", "name"],
+        "properties": {
+          "templateId": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_template",
+      "name": "Delete Template",
+      "description": "Delete a template",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["templateId"],
+        "properties": {
+          "templateId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "duplicate_template",
+      "name": "Duplicate Template",
+      "description": "Create a copy of an existing template",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["templateId", "name"],
+        "properties": {
+          "templateId": { "type": "string" },
+          "name": { "type": "string", "description": "Name for the duplicate" }
+        }
+      }
+    },
+    {
+      "id": "get_template",
+      "name": "Get Template",
+      "description": "Get template details",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["templateId"],
+        "properties": {
+          "templateId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_all_templates",
+      "name": "Get All Templates",
+      "description": "List all templates",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "generations": { "type": "string", "enum": ["legacy", "dynamic", "legacy,dynamic"], "default": "dynamic" },
+          "pageSize": { "type": "number", "default": 10 }
+        }
+      }
+    },
+    {
+      "id": "create_template_version",
+      "name": "Create Template Version",
+      "description": "Create a new version of a template",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["templateId", "name", "htmlContent"],
+        "properties": {
+          "templateId": { "type": "string" },
+          "name": { "type": "string" },
+          "subject": { "type": "string" },
+          "htmlContent": { "type": "string" },
+          "plainContent": { "type": "string" },
+          "active": { "type": "integer", "enum": [0, 1] }
+        }
+      }
+    },
+    {
+      "id": "activate_template_version",
+      "name": "Activate Template Version",
+      "description": "Set active version for a template",
+      "category": "templates",
+      "configSchema": {
+        "type": "object",
+        "required": ["templateId", "versionId"],
+        "properties": {
+          "templateId": { "type": "string" },
+          "versionId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_unsubscribe",
+      "name": "Add Unsubscribe",
+      "description": "Add email to global suppression list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "remove_unsubscribe",
+      "name": "Remove Unsubscribe",
+      "description": "Remove email from global suppression list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_unsubscribes",
+      "name": "Get Unsubscribes",
+      "description": "List all unsubscribed emails",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "integer" },
+          "endTime": { "type": "integer" },
+          "limit": { "type": "number" },
+          "offset": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "add_bounce",
+      "name": "Add Bounce",
+      "description": "Manually add email to bounce list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["emails"],
+        "properties": {
+          "emails": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "delete_bounce",
+      "name": "Delete Bounce",
+      "description": "Remove email from bounce list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_bounces",
+      "name": "Get Bounces",
+      "description": "List all bounced emails",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "integer" },
+          "endTime": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "id": "delete_spam_report",
+      "name": "Delete Spam Report",
+      "description": "Remove from spam reports",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_spam_reports",
+      "name": "Get Spam Reports",
+      "description": "List all spam reports",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "integer" },
+          "endTime": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "id": "add_block",
+      "name": "Add Block",
+      "description": "Add email to blocked list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["emails"],
+        "properties": {
+          "emails": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "delete_block",
+      "name": "Delete Block",
+      "description": "Remove from blocked list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_blocks",
+      "name": "Get Blocks",
+      "description": "List all blocked emails",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "integer" },
+          "endTime": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "id": "delete_invalid_email",
+      "name": "Delete Invalid Email",
+      "description": "Remove from invalid list",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_invalid_emails",
+      "name": "Get Invalid Emails",
+      "description": "List all invalid emails",
+      "category": "suppressions",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "integer" },
+          "endTime": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "id": "validate_email",
+      "name": "Validate Email",
+      "description": "Validate an email address",
+      "category": "validation",
+      "configSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string" },
+          "source": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "validate_emails_bulk",
+      "name": "Validate Emails Bulk",
+      "description": "Bulk validate email addresses",
+      "category": "validation",
+      "configSchema": {
+        "type": "object",
+        "required": ["fileUrl"],
+        "properties": {
+          "fileUrl": { "type": "string", "description": "URL to CSV file" }
+        }
+      }
+    },
+    {
+      "id": "get_validation_job",
+      "name": "Get Validation Job",
+      "description": "Get bulk validation job status",
+      "category": "validation",
+      "configSchema": {
+        "type": "object",
+        "required": ["jobId"],
+        "properties": {
+          "jobId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "authenticate_domain",
+      "name": "Authenticate Domain",
+      "description": "Set up domain authentication (DKIM)",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["domain"],
+        "properties": {
+          "domain": { "type": "string" },
+          "subdomain": { "type": "string" },
+          "customSpf": { "type": "boolean" },
+          "default": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "verify_domain",
+      "name": "Verify Domain",
+      "description": "Verify domain DNS records",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "id": "delete_domain",
+      "name": "Delete Domain",
+      "description": "Remove authenticated domain",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "id": "get_domains",
+      "name": "Get Domains",
+      "description": "List authenticated domains",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "number" },
+          "offset": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "create_api_key",
+      "name": "Create API Key",
+      "description": "Create a new API key",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["name", "scopes"],
+        "properties": {
+          "name": { "type": "string" },
+          "scopes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "update_api_key",
+      "name": "Update API Key",
+      "description": "Update API key name",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["apiKeyId", "name"],
+        "properties": {
+          "apiKeyId": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_api_key",
+      "name": "Delete API Key",
+      "description": "Delete an API key",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["apiKeyId"],
+        "properties": {
+          "apiKeyId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_api_keys",
+      "name": "Get API Keys",
+      "description": "List all API keys",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "create_subuser",
+      "name": "Create Subuser",
+      "description": "Create a subuser account",
+      "category": "subusers",
+      "configSchema": {
+        "type": "object",
+        "required": ["username", "email", "password", "ips"],
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "ips": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "update_subuser",
+      "name": "Update Subuser",
+      "description": "Update subuser settings",
+      "category": "subusers",
+      "configSchema": {
+        "type": "object",
+        "required": ["username"],
+        "properties": {
+          "username": { "type": "string" },
+          "disabled": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "delete_subuser",
+      "name": "Delete Subuser",
+      "description": "Delete a subuser",
+      "category": "subusers",
+      "configSchema": {
+        "type": "object",
+        "required": ["username"],
+        "properties": {
+          "username": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "enable_subuser",
+      "name": "Enable Subuser",
+      "description": "Enable a disabled subuser",
+      "category": "subusers",
+      "configSchema": {
+        "type": "object",
+        "required": ["username"],
+        "properties": {
+          "username": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "disable_subuser",
+      "name": "Disable Subuser",
+      "description": "Disable a subuser",
+      "category": "subusers",
+      "configSchema": {
+        "type": "object",
+        "required": ["username"],
+        "properties": {
+          "username": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_subusers",
+      "name": "Get Subusers",
+      "description": "List all subusers",
+      "category": "subusers",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "limit": { "type": "number" },
+          "offset": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "get_stats_global",
+      "name": "Get Global Stats",
+      "description": "Get overall email statistics",
+      "category": "stats",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startDate": { "type": "string", "description": "YYYY-MM-DD" },
+          "endDate": { "type": "string" },
+          "aggregatedBy": { "type": "string", "enum": ["day", "week", "month"] }
+        }
+      }
+    },
+    {
+      "id": "get_stats_by_category",
+      "name": "Get Stats by Category",
+      "description": "Get stats filtered by category",
+      "category": "stats",
+      "configSchema": {
+        "type": "object",
+        "required": ["categories"],
+        "properties": {
+          "categories": { "type": "array", "items": { "type": "string" } },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_stats_by_subuser",
+      "name": "Get Stats by Subuser",
+      "description": "Get stats for a specific subuser",
+      "category": "stats",
+      "configSchema": {
+        "type": "object",
+        "required": ["subusers"],
+        "properties": {
+          "subusers": { "type": "array", "items": { "type": "string" } },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_stats_by_mailbox_provider",
+      "name": "Get Stats by Mailbox Provider",
+      "description": "Get stats grouped by email provider (Gmail, Yahoo, etc)",
+      "category": "stats",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "mailboxProviders": { "type": "array", "items": { "type": "string" } },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_stats_by_browser",
+      "name": "Get Stats by Browser",
+      "description": "Get open/click stats by browser",
+      "category": "stats",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "browsers": { "type": "array", "items": { "type": "string" } },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_stats_by_device",
+      "name": "Get Stats by Device",
+      "description": "Get stats by device type (desktop, mobile, etc)",
+      "category": "stats",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_webhook",
+      "name": "Create Webhook",
+      "description": "Create event webhook endpoint",
+      "category": "webhooks",
+      "configSchema": {
+        "type": "object",
+        "required": ["url", "enabled"],
+        "properties": {
+          "url": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "oauthClientId": { "type": "string" },
+          "oauthClientSecret": { "type": "string" },
+          "oauthTokenUrl": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_webhook",
+      "name": "Update Webhook",
+      "description": "Update webhook settings",
+      "category": "webhooks",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "url": { "type": "string" },
+          "enabled": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "delete_webhook",
+      "name": "Delete Webhook",
+      "description": "Delete a webhook",
+      "category": "webhooks",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "test_webhook",
+      "name": "Test Webhook",
+      "description": "Send test event to webhook",
+      "category": "webhooks",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_webhooks",
+      "name": "Get Webhooks",
+      "description": "List all webhooks",
+      "category": "webhooks",
+      "configSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "id": "create_parse_webhook",
+      "name": "Create Parse Webhook",
+      "description": "Set up inbound parse webhook",
+      "category": "inbound_parse",
+      "configSchema": {
+        "type": "object",
+        "required": ["url", "hostname"],
+        "properties": {
+          "url": { "type": "string" },
+          "hostname": { "type": "string" },
+          "spamCheck": { "type": "boolean" },
+          "sendRaw": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_parse_webhook",
+      "name": "Update Parse Webhook",
+      "description": "Update parse webhook settings",
+      "category": "inbound_parse",
+      "configSchema": {
+        "type": "object",
+        "required": ["hostname"],
+        "properties": {
+          "hostname": { "type": "string" },
+          "url": { "type": "string" },
+          "spamCheck": { "type": "boolean" },
+          "sendRaw": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "delete_parse_webhook",
+      "name": "Delete Parse Webhook",
+      "description": "Delete parse webhook",
+      "category": "inbound_parse",
+      "configSchema": {
+        "type": "object",
+        "required": ["hostname"],
+        "properties": {
+          "hostname": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_parse_webhooks",
+      "name": "Get Parse Webhooks",
+      "description": "List inbound parse webhooks",
+      "category": "inbound_parse",
+      "configSchema": { "type": "object", "properties": {} }
     }
   ],
   "triggers": [
     {
-      "id": "on_delivered",
+      "id": "email_processed",
+      "name": "Email Processed",
+      "description": "Triggered when email is processed for delivery",
+      "event": "processed"
+    },
+    {
+      "id": "email_dropped",
+      "name": "Email Dropped",
+      "description": "Triggered when email is dropped before sending",
+      "event": "dropped"
+    },
+    {
+      "id": "email_delivered",
       "name": "Email Delivered",
-      "description": "Triggered when email is delivered to recipient",
+      "description": "Triggered when email is delivered to recipient server",
       "event": "delivered"
     },
     {
-      "id": "on_opened",
+      "id": "email_deferred",
+      "name": "Email Deferred",
+      "description": "Triggered when email delivery is temporarily delayed",
+      "event": "deferred"
+    },
+    {
+      "id": "email_bounced",
+      "name": "Email Bounced",
+      "description": "Triggered when email bounces (hard or soft)",
+      "event": "bounce"
+    },
+    {
+      "id": "email_blocked",
+      "name": "Email Blocked",
+      "description": "Triggered when email is blocked by recipient server",
+      "event": "blocked"
+    },
+    {
+      "id": "email_opened",
       "name": "Email Opened",
       "description": "Triggered when recipient opens email",
       "event": "open"
     },
     {
-      "id": "on_clicked",
-      "name": "Link Clicked",
-      "description": "Triggered when recipient clicks a link",
+      "id": "email_clicked",
+      "name": "Email Clicked",
+      "description": "Triggered when recipient clicks a link in the email",
       "event": "click"
     },
     {
-      "id": "on_bounced",
-      "name": "Email Bounced",
-      "description": "Triggered when email bounces",
-      "event": "bounce"
+      "id": "spam_report",
+      "name": "Spam Report",
+      "description": "Triggered when recipient marks email as spam",
+      "event": "spamreport"
     },
     {
-      "id": "on_unsubscribed",
-      "name": "Unsubscribed",
+      "id": "unsubscribe",
+      "name": "Unsubscribe",
       "description": "Triggered when recipient unsubscribes",
       "event": "unsubscribe"
+    },
+    {
+      "id": "group_unsubscribe",
+      "name": "Group Unsubscribe",
+      "description": "Triggered when recipient unsubscribes from a group",
+      "event": "group_unsubscribe"
+    },
+    {
+      "id": "group_resubscribe",
+      "name": "Group Resubscribe",
+      "description": "Triggered when recipient resubscribes to a group",
+      "event": "group_resubscribe"
+    },
+    {
+      "id": "contact_created",
+      "name": "Contact Created",
+      "description": "Triggered when a new contact is added",
+      "event": "contact.created"
+    },
+    {
+      "id": "contact_updated",
+      "name": "Contact Updated",
+      "description": "Triggered when a contact is modified",
+      "event": "contact.updated"
+    },
+    {
+      "id": "contact_deleted",
+      "name": "Contact Deleted",
+      "description": "Triggered when a contact is removed",
+      "event": "contact.deleted"
+    },
+    {
+      "id": "list_created",
+      "name": "List Created",
+      "description": "Triggered when a new list is created",
+      "event": "list.created"
+    },
+    {
+      "id": "list_updated",
+      "name": "List Updated",
+      "description": "Triggered when a list is modified",
+      "event": "list.updated"
+    },
+    {
+      "id": "list_deleted",
+      "name": "List Deleted",
+      "description": "Triggered when a list is deleted",
+      "event": "list.deleted"
+    },
+    {
+      "id": "single_send_sent",
+      "name": "Single Send Sent",
+      "description": "Triggered when a single send campaign is sent",
+      "event": "single_send.sent"
+    },
+    {
+      "id": "automation_triggered",
+      "name": "Automation Triggered",
+      "description": "Triggered when an automation workflow starts",
+      "event": "automation.triggered"
+    },
+    {
+      "id": "inbound_email_received",
+      "name": "Inbound Email Received",
+      "description": "Triggered when inbound parse receives an email",
+      "event": "inbound"
+    },
+    {
+      "id": "validation_completed",
+      "name": "Validation Completed",
+      "description": "Triggered when bulk email validation completes",
+      "event": "validation.completed"
     }
   ],
   "webhooks": {

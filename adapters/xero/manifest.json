@@ -13,18 +13,34 @@
           "firstName": { "type": "string" },
           "lastName": { "type": "string" },
           "emailAddress": { "type": "string" },
-          "phones": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "phoneType": { "type": "string", "enum": ["DEFAULT", "DDI", "MOBILE", "FAX"] },
-                "phoneNumber": { "type": "string" }
-              }
-            }
-          },
+          "phones": { "type": "array", "items": { "type": "object" } },
+          "addresses": { "type": "array", "items": { "type": "object" } },
           "isCustomer": { "type": "boolean", "default": true },
-          "isSupplier": { "type": "boolean", "default": false }
+          "isSupplier": { "type": "boolean", "default": false },
+          "taxNumber": { "type": "string" },
+          "bankAccountDetails": { "type": "string" },
+          "accountsReceivableTaxType": { "type": "string" },
+          "accountsPayableTaxType": { "type": "string" },
+          "defaultCurrency": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_contact",
+      "name": "Update Contact",
+      "description": "Update an existing contact",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["contactId"],
+        "properties": {
+          "contactId": { "type": "string" },
+          "name": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "emailAddress": { "type": "string" },
+          "phones": { "type": "array" },
+          "addresses": { "type": "array" }
         }
       }
     },
@@ -50,8 +66,60 @@
         "type": "object",
         "properties": {
           "where": { "type": "string", "description": "Xero OData filter expression" },
-          "page": { "type": "number", "default": 1 }
+          "page": { "type": "number", "default": 1 },
+          "includeArchived": { "type": "boolean" },
+          "ids": { "type": "array", "items": { "type": "string" } }
         }
+      }
+    },
+    {
+      "id": "archive_contact",
+      "name": "Archive Contact",
+      "description": "Archive a contact",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["contactId"],
+        "properties": {
+          "contactId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_contact_group",
+      "name": "Create Contact Group",
+      "description": "Create a contact group",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_contact_to_group",
+      "name": "Add Contact to Group",
+      "description": "Add a contact to a group",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["contactGroupId", "contactIds"],
+        "properties": {
+          "contactGroupId": { "type": "string" },
+          "contactIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "list_contact_groups",
+      "name": "List Contact Groups",
+      "description": "List all contact groups",
+      "category": "contacts",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
       }
     },
     {
@@ -65,23 +133,34 @@
         "properties": {
           "type": { "type": "string", "enum": ["ACCREC", "ACCPAY"], "description": "ACCREC for sales, ACCPAY for purchases" },
           "contactId": { "type": "string", "description": "Contact ID (GUID)" },
-          "lineItems": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "description": { "type": "string" },
-                "quantity": { "type": "number" },
-                "unitAmount": { "type": "number" },
-                "accountCode": { "type": "string" },
-                "taxType": { "type": "string" }
-              }
-            }
-          },
+          "lineItems": { "type": "array", "items": { "type": "object" } },
           "date": { "type": "string", "description": "Invoice date (YYYY-MM-DD)" },
           "dueDate": { "type": "string", "description": "Due date (YYYY-MM-DD)" },
           "reference": { "type": "string" },
-          "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED", "AUTHORISED"], "default": "DRAFT" }
+          "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED", "AUTHORISED"], "default": "DRAFT" },
+          "invoiceNumber": { "type": "string" },
+          "currencyCode": { "type": "string" },
+          "brandingThemeID": { "type": "string" },
+          "url": { "type": "string" },
+          "sentToContact": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_invoice",
+      "name": "Update Invoice",
+      "description": "Update an existing invoice",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId"],
+        "properties": {
+          "invoiceId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "date": { "type": "string" },
+          "dueDate": { "type": "string" },
+          "reference": { "type": "string" },
+          "status": { "type": "string" }
         }
       }
     },
@@ -108,7 +187,118 @@
         "properties": {
           "where": { "type": "string", "description": "Xero OData filter" },
           "page": { "type": "number", "default": 1 },
-          "statuses": { "type": "array", "items": { "type": "string" } }
+          "statuses": { "type": "array", "items": { "type": "string" } },
+          "contactIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "void_invoice",
+      "name": "Void Invoice",
+      "description": "Void an invoice",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId"],
+        "properties": {
+          "invoiceId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_invoice",
+      "name": "Delete Invoice",
+      "description": "Delete a draft invoice",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId"],
+        "properties": {
+          "invoiceId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "email_invoice",
+      "name": "Email Invoice",
+      "description": "Email an invoice to the contact",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId"],
+        "properties": {
+          "invoiceId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_invoice_pdf",
+      "name": "Get Invoice PDF",
+      "description": "Get invoice as PDF",
+      "category": "invoices",
+      "configSchema": {
+        "type": "object",
+        "required": ["invoiceId"],
+        "properties": {
+          "invoiceId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_credit_note",
+      "name": "Create Credit Note",
+      "description": "Create a credit note",
+      "category": "credit_notes",
+      "configSchema": {
+        "type": "object",
+        "required": ["type", "contactId", "lineItems"],
+        "properties": {
+          "type": { "type": "string", "enum": ["ACCRECCREDIT", "ACCPAYCREDIT"] },
+          "contactId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "date": { "type": "string" },
+          "reference": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_credit_note",
+      "name": "Get Credit Note",
+      "description": "Get credit note details",
+      "category": "credit_notes",
+      "configSchema": {
+        "type": "object",
+        "required": ["creditNoteId"],
+        "properties": {
+          "creditNoteId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_credit_notes",
+      "name": "List Credit Notes",
+      "description": "List credit notes",
+      "category": "credit_notes",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "allocate_credit_note",
+      "name": "Allocate Credit Note",
+      "description": "Allocate credit note to invoices",
+      "category": "credit_notes",
+      "configSchema": {
+        "type": "object",
+        "required": ["creditNoteId", "allocations"],
+        "properties": {
+          "creditNoteId": { "type": "string" },
+          "allocations": { "type": "array", "items": { "type": "object" } }
         }
       }
     },
@@ -125,7 +315,111 @@
           "accountId": { "type": "string", "description": "Bank account ID" },
           "amount": { "type": "number" },
           "date": { "type": "string", "description": "Payment date (YYYY-MM-DD)" },
+          "reference": { "type": "string" },
+          "isReconciled": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_payment",
+      "name": "Get Payment",
+      "description": "Get payment details",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["paymentId"],
+        "properties": {
+          "paymentId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_payments",
+      "name": "List Payments",
+      "description": "List payments",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "delete_payment",
+      "name": "Delete Payment",
+      "description": "Delete a payment",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["paymentId"],
+        "properties": {
+          "paymentId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_batch_payment",
+      "name": "Create Batch Payment",
+      "description": "Create a batch payment for multiple invoices",
+      "category": "payments",
+      "configSchema": {
+        "type": "object",
+        "required": ["accountId", "payments"],
+        "properties": {
+          "accountId": { "type": "string" },
+          "payments": { "type": "array", "items": { "type": "object" } },
+          "date": { "type": "string" },
           "reference": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_account",
+      "name": "Create Account",
+      "description": "Create a chart of accounts entry",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["name", "type", "code"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["BANK", "CURRENT", "CURRLIAB", "DEPRECIATN", "DIRECTCOSTS", "EQUITY", "EXPENSE", "FIXED", "INVENTORY", "LIABILITY", "NONCURRENT", "OTHERINCOME", "OVERHEADS", "PREPAYMENT", "REVENUE", "SALES", "TERMLIAB"] },
+          "code": { "type": "string" },
+          "description": { "type": "string" },
+          "taxType": { "type": "string" },
+          "enablePaymentsToAccount": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_account",
+      "name": "Update Account",
+      "description": "Update an account",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["accountId"],
+        "properties": {
+          "accountId": { "type": "string" },
+          "name": { "type": "string" },
+          "code": { "type": "string" },
+          "description": { "type": "string" },
+          "taxType": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_account",
+      "name": "Get Account",
+      "description": "Get account details",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["accountId"],
+        "properties": {
+          "accountId": { "type": "string" }
         }
       }
     },
@@ -137,35 +431,830 @@
       "configSchema": {
         "type": "object",
         "properties": {
-          "where": { "type": "string", "description": "Xero OData filter" }
+          "where": { "type": "string", "description": "Xero OData filter" },
+          "class": { "type": "string", "enum": ["ASSET", "EQUITY", "EXPENSE", "LIABILITY", "REVENUE"] }
+        }
+      }
+    },
+    {
+      "id": "archive_account",
+      "name": "Archive Account",
+      "description": "Archive an account",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["accountId"],
+        "properties": {
+          "accountId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_account",
+      "name": "Delete Account",
+      "description": "Delete an account (only if unused)",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["accountId"],
+        "properties": {
+          "accountId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_bank_transaction",
+      "name": "Create Bank Transaction",
+      "description": "Create a bank transaction (spend or receive money)",
+      "category": "bank_transactions",
+      "configSchema": {
+        "type": "object",
+        "required": ["type", "contactId", "bankAccountId", "lineItems"],
+        "properties": {
+          "type": { "type": "string", "enum": ["SPEND", "RECEIVE", "SPEND-OVERPAYMENT", "RECEIVE-OVERPAYMENT", "SPEND-PREPAYMENT", "RECEIVE-PREPAYMENT"] },
+          "contactId": { "type": "string" },
+          "bankAccountId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "date": { "type": "string" },
+          "reference": { "type": "string" },
+          "isReconciled": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_bank_transaction",
+      "name": "Update Bank Transaction",
+      "description": "Update a bank transaction",
+      "category": "bank_transactions",
+      "configSchema": {
+        "type": "object",
+        "required": ["bankTransactionId"],
+        "properties": {
+          "bankTransactionId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "date": { "type": "string" },
+          "reference": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_bank_transaction",
+      "name": "Get Bank Transaction",
+      "description": "Get bank transaction details",
+      "category": "bank_transactions",
+      "configSchema": {
+        "type": "object",
+        "required": ["bankTransactionId"],
+        "properties": {
+          "bankTransactionId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_bank_transactions",
+      "name": "List Bank Transactions",
+      "description": "List bank transactions",
+      "category": "bank_transactions",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" },
+          "bankAccountId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_bank_transfer",
+      "name": "Create Bank Transfer",
+      "description": "Transfer money between bank accounts",
+      "category": "bank_transactions",
+      "configSchema": {
+        "type": "object",
+        "required": ["fromBankAccountId", "toBankAccountId", "amount"],
+        "properties": {
+          "fromBankAccountId": { "type": "string" },
+          "toBankAccountId": { "type": "string" },
+          "amount": { "type": "number" },
+          "date": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_bank_statement_report",
+      "name": "Get Bank Statement Report",
+      "description": "Get bank statement report",
+      "category": "bank_transactions",
+      "configSchema": {
+        "type": "object",
+        "required": ["bankAccountId"],
+        "properties": {
+          "bankAccountId": { "type": "string" },
+          "fromDate": { "type": "string" },
+          "toDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_quote",
+      "name": "Create Quote",
+      "description": "Create a quote/estimate",
+      "category": "quotes",
+      "configSchema": {
+        "type": "object",
+        "required": ["contactId", "lineItems"],
+        "properties": {
+          "contactId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "date": { "type": "string" },
+          "expiryDate": { "type": "string" },
+          "reference": { "type": "string" },
+          "terms": { "type": "string" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "status": { "type": "string", "enum": ["DRAFT", "SENT", "ACCEPTED", "DECLINED"] }
+        }
+      }
+    },
+    {
+      "id": "update_quote",
+      "name": "Update Quote",
+      "description": "Update a quote",
+      "category": "quotes",
+      "configSchema": {
+        "type": "object",
+        "required": ["quoteId"],
+        "properties": {
+          "quoteId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "expiryDate": { "type": "string" },
+          "reference": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_quote",
+      "name": "Get Quote",
+      "description": "Get quote details",
+      "category": "quotes",
+      "configSchema": {
+        "type": "object",
+        "required": ["quoteId"],
+        "properties": {
+          "quoteId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_quotes",
+      "name": "List Quotes",
+      "description": "List quotes",
+      "category": "quotes",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" },
+          "status": { "type": "string" },
+          "contactId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_purchase_order",
+      "name": "Create Purchase Order",
+      "description": "Create a purchase order",
+      "category": "purchase_orders",
+      "configSchema": {
+        "type": "object",
+        "required": ["contactId", "lineItems"],
+        "properties": {
+          "contactId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "date": { "type": "string" },
+          "deliveryDate": { "type": "string" },
+          "reference": { "type": "string" },
+          "deliveryAddress": { "type": "string" },
+          "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED", "AUTHORISED", "BILLED", "DELETED"] }
+        }
+      }
+    },
+    {
+      "id": "update_purchase_order",
+      "name": "Update Purchase Order",
+      "description": "Update a purchase order",
+      "category": "purchase_orders",
+      "configSchema": {
+        "type": "object",
+        "required": ["purchaseOrderId"],
+        "properties": {
+          "purchaseOrderId": { "type": "string" },
+          "lineItems": { "type": "array" },
+          "deliveryDate": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_purchase_order",
+      "name": "Get Purchase Order",
+      "description": "Get purchase order details",
+      "category": "purchase_orders",
+      "configSchema": {
+        "type": "object",
+        "required": ["purchaseOrderId"],
+        "properties": {
+          "purchaseOrderId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_purchase_orders",
+      "name": "List Purchase Orders",
+      "description": "List purchase orders",
+      "category": "purchase_orders",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_item",
+      "name": "Create Item",
+      "description": "Create an inventory/tracked item",
+      "category": "items",
+      "configSchema": {
+        "type": "object",
+        "required": ["code"],
+        "properties": {
+          "code": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "purchaseDescription": { "type": "string" },
+          "purchaseDetails": { "type": "object" },
+          "salesDetails": { "type": "object" },
+          "isTrackedAsInventory": { "type": "boolean" },
+          "inventoryAssetAccountCode": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_item",
+      "name": "Update Item",
+      "description": "Update an item",
+      "category": "items",
+      "configSchema": {
+        "type": "object",
+        "required": ["itemId"],
+        "properties": {
+          "itemId": { "type": "string" },
+          "code": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_item",
+      "name": "Get Item",
+      "description": "Get item details",
+      "category": "items",
+      "configSchema": {
+        "type": "object",
+        "required": ["itemId"],
+        "properties": {
+          "itemId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_items",
+      "name": "List Items",
+      "description": "List items",
+      "category": "items",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "delete_item",
+      "name": "Delete Item",
+      "description": "Delete an item",
+      "category": "items",
+      "configSchema": {
+        "type": "object",
+        "required": ["itemId"],
+        "properties": {
+          "itemId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_manual_journal",
+      "name": "Create Manual Journal",
+      "description": "Create a manual journal entry",
+      "category": "journals",
+      "configSchema": {
+        "type": "object",
+        "required": ["narration", "journalLines"],
+        "properties": {
+          "narration": { "type": "string" },
+          "journalLines": { "type": "array" },
+          "date": { "type": "string" },
+          "showOnCashBasisReports": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_manual_journal",
+      "name": "Update Manual Journal",
+      "description": "Update a manual journal",
+      "category": "journals",
+      "configSchema": {
+        "type": "object",
+        "required": ["manualJournalId"],
+        "properties": {
+          "manualJournalId": { "type": "string" },
+          "narration": { "type": "string" },
+          "journalLines": { "type": "array" }
+        }
+      }
+    },
+    {
+      "id": "get_manual_journal",
+      "name": "Get Manual Journal",
+      "description": "Get manual journal details",
+      "category": "journals",
+      "configSchema": {
+        "type": "object",
+        "required": ["manualJournalId"],
+        "properties": {
+          "manualJournalId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_manual_journals",
+      "name": "List Manual Journals",
+      "description": "List manual journals",
+      "category": "journals",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "get_profit_and_loss",
+      "name": "Get Profit and Loss Report",
+      "description": "Get profit and loss report",
+      "category": "reports",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "fromDate": { "type": "string" },
+          "toDate": { "type": "string" },
+          "periods": { "type": "number" },
+          "timeframe": { "type": "string", "enum": ["MONTH", "QUARTER", "YEAR"] },
+          "trackingCategoryID": { "type": "string" },
+          "trackingOptionID": { "type": "string" },
+          "standardLayout": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_balance_sheet",
+      "name": "Get Balance Sheet Report",
+      "description": "Get balance sheet report",
+      "category": "reports",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "periods": { "type": "number" },
+          "timeframe": { "type": "string", "enum": ["MONTH", "QUARTER", "YEAR"] },
+          "trackingOptionID": { "type": "string" },
+          "standardLayout": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_trial_balance",
+      "name": "Get Trial Balance Report",
+      "description": "Get trial balance report",
+      "category": "reports",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "paymentsOnly": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_aged_receivables",
+      "name": "Get Aged Receivables Report",
+      "description": "Get aged receivables report",
+      "category": "reports",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "fromDate": { "type": "string" },
+          "toDate": { "type": "string" },
+          "contactId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_aged_payables",
+      "name": "Get Aged Payables Report",
+      "description": "Get aged payables report",
+      "category": "reports",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "fromDate": { "type": "string" },
+          "toDate": { "type": "string" },
+          "contactId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_budget_summary",
+      "name": "Get Budget Summary Report",
+      "description": "Get budget summary report",
+      "category": "reports",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "periods": { "type": "number" },
+          "timeframe": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "list_tax_rates",
+      "name": "List Tax Rates",
+      "description": "List tax rates",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_organisation",
+      "name": "Get Organisation",
+      "description": "Get organisation details",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "id": "list_currencies",
+      "name": "List Currencies",
+      "description": "List currencies",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "id": "list_branding_themes",
+      "name": "List Branding Themes",
+      "description": "List branding themes",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "id": "list_tracking_categories",
+      "name": "List Tracking Categories",
+      "description": "List tracking categories",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "id": "create_tracking_category",
+      "name": "Create Tracking Category",
+      "description": "Create a tracking category",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_tracking_option",
+      "name": "Add Tracking Option",
+      "description": "Add an option to a tracking category",
+      "category": "settings",
+      "configSchema": {
+        "type": "object",
+        "required": ["trackingCategoryId", "name"],
+        "properties": {
+          "trackingCategoryId": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_expense_claim",
+      "name": "Create Expense Claim",
+      "description": "Create an expense claim",
+      "category": "expense_claims",
+      "configSchema": {
+        "type": "object",
+        "required": ["userId", "receipts"],
+        "properties": {
+          "userId": { "type": "string" },
+          "receipts": { "type": "array" },
+          "status": { "type": "string", "enum": ["SUBMITTED", "AUTHORISED", "PAID"] }
+        }
+      }
+    },
+    {
+      "id": "get_expense_claim",
+      "name": "Get Expense Claim",
+      "description": "Get expense claim details",
+      "category": "expense_claims",
+      "configSchema": {
+        "type": "object",
+        "required": ["expenseClaimId"],
+        "properties": {
+          "expenseClaimId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_expense_claims",
+      "name": "List Expense Claims",
+      "description": "List expense claims",
+      "category": "expense_claims",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" },
+          "page": { "type": "number" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_users",
+      "name": "List Users",
+      "description": "List users in the organisation",
+      "category": "users",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "where": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_user",
+      "name": "Get User",
+      "description": "Get user details",
+      "category": "users",
+      "configSchema": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "userId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_attachment",
+      "name": "Create Attachment",
+      "description": "Attach a file to an entity",
+      "category": "attachments",
+      "configSchema": {
+        "type": "object",
+        "required": ["entityType", "entityId", "fileName", "content"],
+        "properties": {
+          "entityType": { "type": "string", "enum": ["Invoices", "Receipts", "CreditNotes", "Contacts", "Accounts", "ManualJournals", "BankTransactions", "BankTransfers", "PurchaseOrders", "Quotes"] },
+          "entityId": { "type": "string" },
+          "fileName": { "type": "string" },
+          "content": { "type": "string", "description": "Base64 encoded content" },
+          "mimeType": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_attachments",
+      "name": "List Attachments",
+      "description": "List attachments for an entity",
+      "category": "attachments",
+      "configSchema": {
+        "type": "object",
+        "required": ["entityType", "entityId"],
+        "properties": {
+          "entityType": { "type": "string" },
+          "entityId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_attachment",
+      "name": "Get Attachment",
+      "description": "Get attachment content",
+      "category": "attachments",
+      "configSchema": {
+        "type": "object",
+        "required": ["entityType", "entityId", "fileName"],
+        "properties": {
+          "entityType": { "type": "string" },
+          "entityId": { "type": "string" },
+          "fileName": { "type": "string" }
         }
       }
     }
   ],
   "triggers": [
     {
-      "id": "on_invoice_created",
+      "id": "invoice_created",
       "name": "Invoice Created",
       "description": "Triggered when an invoice is created",
       "event": "INVOICE.CREATE"
     },
     {
-      "id": "on_invoice_updated",
+      "id": "invoice_updated",
       "name": "Invoice Updated",
       "description": "Triggered when an invoice is updated",
       "event": "INVOICE.UPDATE"
     },
     {
-      "id": "on_contact_created",
+      "id": "invoice_voided",
+      "name": "Invoice Voided",
+      "description": "Triggered when an invoice is voided",
+      "event": "INVOICE.VOID"
+    },
+    {
+      "id": "invoice_deleted",
+      "name": "Invoice Deleted",
+      "description": "Triggered when a draft invoice is deleted",
+      "event": "INVOICE.DELETE"
+    },
+    {
+      "id": "contact_created",
       "name": "Contact Created",
       "description": "Triggered when a contact is created",
       "event": "CONTACT.CREATE"
     },
     {
-      "id": "on_payment_created",
+      "id": "contact_updated",
+      "name": "Contact Updated",
+      "description": "Triggered when a contact is updated",
+      "event": "CONTACT.UPDATE"
+    },
+    {
+      "id": "contact_archived",
+      "name": "Contact Archived",
+      "description": "Triggered when a contact is archived",
+      "event": "CONTACT.ARCHIVE"
+    },
+    {
+      "id": "payment_created",
       "name": "Payment Created",
       "description": "Triggered when a payment is recorded",
       "event": "PAYMENT.CREATE"
+    },
+    {
+      "id": "payment_updated",
+      "name": "Payment Updated",
+      "description": "Triggered when a payment is updated",
+      "event": "PAYMENT.UPDATE"
+    },
+    {
+      "id": "payment_deleted",
+      "name": "Payment Deleted",
+      "description": "Triggered when a payment is deleted",
+      "event": "PAYMENT.DELETE"
+    },
+    {
+      "id": "credit_note_created",
+      "name": "Credit Note Created",
+      "description": "Triggered when a credit note is created",
+      "event": "CREDITNOTE.CREATE"
+    },
+    {
+      "id": "credit_note_updated",
+      "name": "Credit Note Updated",
+      "description": "Triggered when a credit note is updated",
+      "event": "CREDITNOTE.UPDATE"
+    },
+    {
+      "id": "quote_created",
+      "name": "Quote Created",
+      "description": "Triggered when a quote is created",
+      "event": "QUOTE.CREATE"
+    },
+    {
+      "id": "quote_updated",
+      "name": "Quote Updated",
+      "description": "Triggered when a quote is updated",
+      "event": "QUOTE.UPDATE"
+    },
+    {
+      "id": "quote_accepted",
+      "name": "Quote Accepted",
+      "description": "Triggered when a quote is accepted",
+      "event": "QUOTE.ACCEPT"
+    },
+    {
+      "id": "quote_declined",
+      "name": "Quote Declined",
+      "description": "Triggered when a quote is declined",
+      "event": "QUOTE.DECLINE"
+    },
+    {
+      "id": "purchase_order_created",
+      "name": "Purchase Order Created",
+      "description": "Triggered when a purchase order is created",
+      "event": "PURCHASEORDER.CREATE"
+    },
+    {
+      "id": "purchase_order_updated",
+      "name": "Purchase Order Updated",
+      "description": "Triggered when a purchase order is updated",
+      "event": "PURCHASEORDER.UPDATE"
+    },
+    {
+      "id": "bank_transaction_created",
+      "name": "Bank Transaction Created",
+      "description": "Triggered when a bank transaction is created",
+      "event": "BANKTRANSACTION.CREATE"
+    },
+    {
+      "id": "bank_transaction_updated",
+      "name": "Bank Transaction Updated",
+      "description": "Triggered when a bank transaction is updated",
+      "event": "BANKTRANSACTION.UPDATE"
+    },
+    {
+      "id": "manual_journal_created",
+      "name": "Manual Journal Created",
+      "description": "Triggered when a manual journal is created",
+      "event": "MANUALJOURNAL.CREATE"
+    },
+    {
+      "id": "manual_journal_updated",
+      "name": "Manual Journal Updated",
+      "description": "Triggered when a manual journal is updated",
+      "event": "MANUALJOURNAL.UPDATE"
+    },
+    {
+      "id": "item_created",
+      "name": "Item Created",
+      "description": "Triggered when an item is created",
+      "event": "ITEM.CREATE"
+    },
+    {
+      "id": "item_updated",
+      "name": "Item Updated",
+      "description": "Triggered when an item is updated",
+      "event": "ITEM.UPDATE"
+    },
+    {
+      "id": "expense_claim_created",
+      "name": "Expense Claim Created",
+      "description": "Triggered when an expense claim is created",
+      "event": "EXPENSECLAIM.CREATE"
+    },
+    {
+      "id": "expense_claim_updated",
+      "name": "Expense Claim Updated",
+      "description": "Triggered when an expense claim is updated",
+      "event": "EXPENSECLAIM.UPDATE"
     }
   ],
   "webhooks": {
@@ -186,6 +1275,16 @@
             "description": { "type": "string", "description": "Invoice line description" },
             "amount": { "type": "number", "description": "Invoice amount" },
             "due_date": { "type": "string", "description": "Due date (YYYY-MM-DD)" }
+          }
+        }
+      },
+      {
+        "name": "xero_get_balance",
+        "description": "Get account balances and financial summary",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "as_of_date": { "type": "string", "description": "Date for balance snapshot (YYYY-MM-DD)" }
           }
         }
       }

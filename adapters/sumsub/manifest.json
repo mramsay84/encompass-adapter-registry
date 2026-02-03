@@ -15,8 +15,13 @@
           "phone": { "type": "string" },
           "firstName": { "type": "string" },
           "lastName": { "type": "string" },
+          "middleName": { "type": "string" },
           "dateOfBirth": { "type": "string", "description": "YYYY-MM-DD format" },
-          "country": { "type": "string", "description": "ISO 3166-1 alpha-3 country code" }
+          "placeOfBirth": { "type": "string" },
+          "country": { "type": "string", "description": "ISO 3166-1 alpha-3 country code" },
+          "nationality": { "type": "string" },
+          "gender": { "type": "string", "enum": ["M", "F"] },
+          "lang": { "type": "string", "description": "Language code (en, de, etc.)" }
         }
       }
     },
@@ -34,10 +39,154 @@
       }
     },
     {
+      "id": "get_applicant_by_external_id",
+      "name": "Get Applicant by External ID",
+      "description": "Get applicant details by your external user ID",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["externalUserId"],
+        "properties": {
+          "externalUserId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_applicant",
+      "name": "Update Applicant",
+      "description": "Update applicant information",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "dateOfBirth": { "type": "string" },
+          "country": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_applicant",
+      "name": "Delete Applicant",
+      "description": "Delete an applicant and all their data (GDPR)",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
       "id": "get_applicant_status",
       "name": "Get Applicant Status",
       "description": "Get verification status for an applicant",
       "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "reset_applicant",
+      "name": "Reset Applicant",
+      "description": "Reset applicant verification to start fresh",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "change_applicant_level",
+      "name": "Change Applicant Level",
+      "description": "Change the verification level for an applicant",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "levelName"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "levelName": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_applicants",
+      "name": "List Applicants",
+      "description": "List applicants with optional filters",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "offset": { "type": "number" },
+          "limit": { "type": "number", "default": 100 },
+          "createdAtGte": { "type": "string", "description": "Created at >= (ISO date)" },
+          "createdAtLte": { "type": "string", "description": "Created at <= (ISO date)" }
+        }
+      }
+    },
+    {
+      "id": "search_applicants",
+      "name": "Search Applicants",
+      "description": "Search applicants by various criteria",
+      "category": "applicants",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Search query (name, email, etc.)" },
+          "reviewStatus": { "type": "string", "enum": ["init", "pending", "queued", "completed", "onHold"] },
+          "reviewResult": { "type": "string", "enum": ["GREEN", "RED"] }
+        }
+      }
+    },
+    {
+      "id": "request_verification",
+      "name": "Request Verification",
+      "description": "Start verification check for an applicant",
+      "category": "verification",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "reason": { "type": "string", "description": "Optional reason for check" }
+        }
+      }
+    },
+    {
+      "id": "set_verification_result",
+      "name": "Set Verification Result",
+      "description": "Manually set verification result (GREEN/RED)",
+      "category": "verification",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "reviewAnswer"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "reviewAnswer": { "type": "string", "enum": ["GREEN", "RED"] },
+          "moderationComment": { "type": "string" },
+          "rejectLabels": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "get_verification_result",
+      "name": "Get Verification Result",
+      "description": "Get detailed verification result",
+      "category": "verification",
       "configSchema": {
         "type": "object",
         "required": ["applicantId"],
@@ -62,6 +211,21 @@
       }
     },
     {
+      "id": "generate_external_link",
+      "name": "Generate External Link",
+      "description": "Generate a verification link to send to user",
+      "category": "sdk",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "ttlInSecs": { "type": "number", "default": 3600 },
+          "lang": { "type": "string" }
+        }
+      }
+    },
+    {
       "id": "add_document",
       "name": "Add Document",
       "description": "Upload a document for an applicant",
@@ -71,57 +235,442 @@
         "required": ["applicantId", "idDocType", "content"],
         "properties": {
           "applicantId": { "type": "string" },
-          "idDocType": { "type": "string", "description": "Document type: PASSPORT, ID_CARD, DRIVERS, etc." },
+          "idDocType": { "type": "string", "enum": ["PASSPORT", "ID_CARD", "DRIVERS", "RESIDENCE_PERMIT", "UTILITY_BILL", "BANK_STATEMENT", "SELFIE", "VIDEO_SELFIE", "PROOF_OF_ADDRESS", "PROFILE_IMAGE"] },
           "content": { "type": "string", "description": "Base64 encoded document image" },
-          "country": { "type": "string", "description": "Issuing country code" }
+          "country": { "type": "string", "description": "Issuing country code (3-letter)" },
+          "idDocSubType": { "type": "string", "enum": ["FRONT_SIDE", "BACK_SIDE"] }
         }
       }
     },
     {
-      "id": "request_verification",
-      "name": "Request Verification",
-      "description": "Start verification check for an applicant",
-      "category": "applicants",
+      "id": "get_document",
+      "name": "Get Document",
+      "description": "Get document image by ID",
+      "category": "documents",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "imageId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "imageId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_document",
+      "name": "Delete Document",
+      "description": "Delete a document from applicant",
+      "category": "documents",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "imageId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "imageId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_documents",
+      "name": "List Documents",
+      "description": "List all documents for an applicant",
+      "category": "documents",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_address",
+      "name": "Add Address",
+      "description": "Add address information to applicant",
+      "category": "addresses",
       "configSchema": {
         "type": "object",
         "required": ["applicantId"],
         "properties": {
           "applicantId": { "type": "string" },
-          "reason": { "type": "string", "description": "Optional reason for check" }
+          "country": { "type": "string" },
+          "state": { "type": "string" },
+          "town": { "type": "string" },
+          "street": { "type": "string" },
+          "buildingNumber": { "type": "string" },
+          "postCode": { "type": "string" },
+          "flatNumber": { "type": "string" }
         }
+      }
+    },
+    {
+      "id": "get_address",
+      "name": "Get Address",
+      "description": "Get address information for applicant",
+      "category": "addresses",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_company_applicant",
+      "name": "Create Company Applicant",
+      "description": "Create a company/business applicant for KYB",
+      "category": "kyb",
+      "configSchema": {
+        "type": "object",
+        "required": ["externalUserId", "levelName", "companyInfo"],
+        "properties": {
+          "externalUserId": { "type": "string" },
+          "levelName": { "type": "string" },
+          "companyInfo": {
+            "type": "object",
+            "properties": {
+              "companyName": { "type": "string" },
+              "registrationNumber": { "type": "string" },
+              "country": { "type": "string" },
+              "legalAddress": { "type": "string" },
+              "incorporatedOn": { "type": "string" },
+              "type": { "type": "string" },
+              "website": { "type": "string" },
+              "taxId": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "add_beneficial_owner",
+      "name": "Add Beneficial Owner",
+      "description": "Add a beneficial owner to a company",
+      "category": "kyb",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "beneficiaryApplicantId"],
+        "properties": {
+          "applicantId": { "type": "string", "description": "Company applicant ID" },
+          "beneficiaryApplicantId": { "type": "string", "description": "Individual applicant ID" },
+          "shareSize": { "type": "number", "description": "Ownership percentage" },
+          "positions": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "id": "get_beneficial_owners",
+      "name": "Get Beneficial Owners",
+      "description": "Get all beneficial owners for a company",
+      "category": "kyb",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "remove_beneficial_owner",
+      "name": "Remove Beneficial Owner",
+      "description": "Remove a beneficial owner from company",
+      "category": "kyb",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "beneficiaryApplicantId"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "beneficiaryApplicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "aml_check",
+      "name": "AML Check",
+      "description": "Perform AML/PEP/sanctions screening",
+      "category": "aml",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_aml_result",
+      "name": "Get AML Result",
+      "description": "Get AML screening results",
+      "category": "aml",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_to_blocklist",
+      "name": "Add to Blocklist",
+      "description": "Add an applicant to internal blocklist",
+      "category": "aml",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "note"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "remove_from_blocklist",
+      "name": "Remove from Blocklist",
+      "description": "Remove an applicant from blocklist",
+      "category": "aml",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_tag",
+      "name": "Add Tag",
+      "description": "Add a tag to an applicant",
+      "category": "tags",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "tag"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "tag": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "remove_tag",
+      "name": "Remove Tag",
+      "description": "Remove a tag from an applicant",
+      "category": "tags",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "tag"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "tag": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_tags",
+      "name": "Get Tags",
+      "description": "Get all tags for an applicant",
+      "category": "tags",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_note",
+      "name": "Add Note",
+      "description": "Add a note/comment to applicant",
+      "category": "notes",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId", "note"],
+        "properties": {
+          "applicantId": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_notes",
+      "name": "Get Notes",
+      "description": "Get all notes for an applicant",
+      "category": "notes",
+      "configSchema": {
+        "type": "object",
+        "required": ["applicantId"],
+        "properties": {
+          "applicantId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_inspection_checks",
+      "name": "Get Inspection Checks",
+      "description": "Get detailed inspection check results",
+      "category": "inspections",
+      "configSchema": {
+        "type": "object",
+        "required": ["inspectionId"],
+        "properties": {
+          "inspectionId": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_required_id_docs",
+      "name": "Get Required ID Docs",
+      "description": "Get list of required documents for a level",
+      "category": "levels",
+      "configSchema": {
+        "type": "object",
+        "required": ["levelName"],
+        "properties": {
+          "levelName": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_level_config",
+      "name": "Get Level Config",
+      "description": "Get verification level configuration",
+      "category": "levels",
+      "configSchema": {
+        "type": "object",
+        "required": ["levelName"],
+        "properties": {
+          "levelName": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_levels",
+      "name": "List Levels",
+      "description": "List all verification levels",
+      "category": "levels",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
       }
     }
   ],
   "triggers": [
     {
-      "id": "on_applicant_created",
+      "id": "applicant_created",
       "name": "Applicant Created",
       "description": "Triggered when a new applicant is created",
       "event": "applicantCreated"
     },
     {
-      "id": "on_applicant_pending",
+      "id": "applicant_pending",
       "name": "Applicant Pending",
       "description": "Triggered when applicant is awaiting review",
       "event": "applicantPending"
     },
     {
-      "id": "on_applicant_reviewed",
+      "id": "applicant_reviewed",
       "name": "Applicant Reviewed",
       "description": "Triggered when verification review is completed",
       "event": "applicantReviewed"
     },
     {
-      "id": "on_applicant_approved",
+      "id": "applicant_approved",
       "name": "Applicant Approved",
       "description": "Triggered when applicant is approved (GREEN)",
       "event": "applicantApproved"
     },
     {
-      "id": "on_applicant_rejected",
+      "id": "applicant_rejected",
       "name": "Applicant Rejected",
       "description": "Triggered when applicant is rejected (RED)",
       "event": "applicantRejected"
+    },
+    {
+      "id": "applicant_prechecked",
+      "name": "Applicant Prechecked",
+      "description": "Triggered when auto-review is completed",
+      "event": "applicantPrechecked"
+    },
+    {
+      "id": "applicant_on_hold",
+      "name": "Applicant On Hold",
+      "description": "Triggered when applicant is put on hold",
+      "event": "applicantOnHold"
+    },
+    {
+      "id": "applicant_personal_info_changed",
+      "name": "Applicant Personal Info Changed",
+      "description": "Triggered when applicant info is updated",
+      "event": "applicantPersonalInfoChanged"
+    },
+    {
+      "id": "applicant_deleted",
+      "name": "Applicant Deleted",
+      "description": "Triggered when applicant is deleted",
+      "event": "applicantDeleted"
+    },
+    {
+      "id": "applicant_reset",
+      "name": "Applicant Reset",
+      "description": "Triggered when applicant is reset",
+      "event": "applicantReset"
+    },
+    {
+      "id": "applicant_workflow_completed",
+      "name": "Applicant Workflow Completed",
+      "description": "Triggered when full verification workflow completes",
+      "event": "applicantWorkflowCompleted"
+    },
+    {
+      "id": "applicant_action_pending",
+      "name": "Applicant Action Pending",
+      "description": "Triggered when applicant action is needed",
+      "event": "applicantActionPending"
+    },
+    {
+      "id": "applicant_tags_changed",
+      "name": "Applicant Tags Changed",
+      "description": "Triggered when applicant tags are modified",
+      "event": "applicantTagsChanged"
+    },
+    {
+      "id": "video_ident_initiated",
+      "name": "Video Ident Initiated",
+      "description": "Triggered when video identification starts",
+      "event": "videoIdentInitiated"
+    },
+    {
+      "id": "video_ident_completed",
+      "name": "Video Ident Completed",
+      "description": "Triggered when video identification completes",
+      "event": "videoIdentCompleted"
+    },
+    {
+      "id": "document_uploaded",
+      "name": "Document Uploaded",
+      "description": "Triggered when a document is uploaded",
+      "event": "documentUploaded"
+    },
+    {
+      "id": "inspection_completed",
+      "name": "Inspection Completed",
+      "description": "Triggered when document inspection completes",
+      "event": "inspectionCompleted"
+    },
+    {
+      "id": "aml_match_found",
+      "name": "AML Match Found",
+      "description": "Triggered when AML screening finds a match",
+      "event": "amlMatchFound"
+    },
+    {
+      "id": "aml_no_match",
+      "name": "AML No Match",
+      "description": "Triggered when AML screening finds no matches",
+      "event": "amlNoMatch"
     }
   ],
   "webhooks": {
@@ -152,6 +701,18 @@
           "required": ["user_id"],
           "properties": {
             "user_id": { "type": "string", "description": "Your app's user ID" }
+          }
+        }
+      },
+      {
+        "name": "sumsub_generate_link",
+        "description": "Generate a verification link for a user",
+        "inputSchema": {
+          "type": "object",
+          "required": ["user_id", "level"],
+          "properties": {
+            "user_id": { "type": "string" },
+            "level": { "type": "string" }
           }
         }
       }

@@ -17,6 +17,22 @@
       }
     },
     {
+      "id": "send_mms",
+      "name": "Send MMS",
+      "description": "Send an MMS message with media attachments",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "mediaUrl"],
+        "properties": {
+          "to": { "type": "string" },
+          "from": { "type": "string" },
+          "body": { "type": "string" },
+          "mediaUrl": { "type": "array", "items": { "type": "string" }, "description": "URLs of media files" }
+        }
+      }
+    },
+    {
       "id": "send_whatsapp",
       "name": "Send WhatsApp Message",
       "description": "Send a WhatsApp message (requires approved template for new conversations)",
@@ -47,6 +63,131 @@
       }
     },
     {
+      "id": "list_messages",
+      "name": "List Messages",
+      "description": "List messages for the account",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "to": { "type": "string", "description": "Filter by recipient" },
+          "from": { "type": "string", "description": "Filter by sender" },
+          "dateSent": { "type": "string", "description": "Filter by date" },
+          "pageSize": { "type": "number", "default": 50 }
+        }
+      }
+    },
+    {
+      "id": "delete_message",
+      "name": "Delete Message",
+      "description": "Delete a message record",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "required": ["messageSid"],
+        "properties": {
+          "messageSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "redact_message",
+      "name": "Redact Message",
+      "description": "Redact message body for compliance",
+      "category": "messaging",
+      "configSchema": {
+        "type": "object",
+        "required": ["messageSid"],
+        "properties": {
+          "messageSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_messaging_service",
+      "name": "Create Messaging Service",
+      "description": "Create a messaging service for sending messages",
+      "category": "messaging_services",
+      "configSchema": {
+        "type": "object",
+        "required": ["friendlyName"],
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "inboundRequestUrl": { "type": "string" },
+          "fallbackUrl": { "type": "string" },
+          "statusCallback": { "type": "string" },
+          "useInboundWebhookOnNumber": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_messaging_service",
+      "name": "Update Messaging Service",
+      "description": "Update a messaging service configuration",
+      "category": "messaging_services",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "inboundRequestUrl": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_messaging_service",
+      "name": "Delete Messaging Service",
+      "description": "Delete a messaging service",
+      "category": "messaging_services",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid"],
+        "properties": {
+          "serviceSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_messaging_service",
+      "name": "Get Messaging Service",
+      "description": "Get messaging service details",
+      "category": "messaging_services",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid"],
+        "properties": {
+          "serviceSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_messaging_services",
+      "name": "List Messaging Services",
+      "description": "List all messaging services",
+      "category": "messaging_services",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "pageSize": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "add_phone_to_service",
+      "name": "Add Phone to Service",
+      "description": "Add a phone number to a messaging service",
+      "category": "messaging_services",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid", "phoneNumberSid"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "phoneNumberSid": { "type": "string" }
+        }
+      }
+    },
+    {
       "id": "make_call",
       "name": "Make Call",
       "description": "Initiate an outbound voice call",
@@ -60,7 +201,8 @@
           "url": { "type": "string", "description": "URL for TwiML instructions when call connects" },
           "twiml": { "type": "string", "description": "Inline TwiML (alternative to url)" },
           "record": { "type": "boolean", "default": false, "description": "Record the call" },
-          "timeout": { "type": "number", "default": 60, "description": "Seconds to wait for answer" }
+          "timeout": { "type": "number", "default": 60, "description": "Seconds to wait for answer" },
+          "machineDetection": { "type": "string", "enum": ["Enable", "DetectMessageEnd"] }
         }
       }
     },
@@ -78,6 +220,253 @@
       }
     },
     {
+      "id": "list_calls",
+      "name": "List Calls",
+      "description": "List calls for the account",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "to": { "type": "string" },
+          "from": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued", "ringing", "in-progress", "completed", "busy", "failed", "no-answer", "canceled"] },
+          "startTime": { "type": "string" },
+          "pageSize": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "update_call",
+      "name": "Update Call",
+      "description": "Modify an in-progress call",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["callSid"],
+        "properties": {
+          "callSid": { "type": "string" },
+          "url": { "type": "string", "description": "New TwiML URL" },
+          "twiml": { "type": "string" },
+          "status": { "type": "string", "enum": ["canceled", "completed"] }
+        }
+      }
+    },
+    {
+      "id": "delete_call",
+      "name": "Delete Call",
+      "description": "Delete a call record",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["callSid"],
+        "properties": {
+          "callSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_call_recording",
+      "name": "Create Call Recording",
+      "description": "Start recording an in-progress call",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["callSid"],
+        "properties": {
+          "callSid": { "type": "string" },
+          "recordingStatusCallback": { "type": "string" },
+          "recordingChannels": { "type": "string", "enum": ["mono", "dual"] }
+        }
+      }
+    },
+    {
+      "id": "get_recording",
+      "name": "Get Recording",
+      "description": "Get recording details",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["recordingSid"],
+        "properties": {
+          "recordingSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_recordings",
+      "name": "List Recordings",
+      "description": "List all recordings",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "callSid": { "type": "string" },
+          "dateCreated": { "type": "string" },
+          "pageSize": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "delete_recording",
+      "name": "Delete Recording",
+      "description": "Delete a recording",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["recordingSid"],
+        "properties": {
+          "recordingSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_transcription",
+      "name": "Create Transcription",
+      "description": "Create a transcription of a recording",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["recordingSid"],
+        "properties": {
+          "recordingSid": { "type": "string" },
+          "statusCallback": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_transcription",
+      "name": "Get Transcription",
+      "description": "Get transcription details and text",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["transcriptionSid"],
+        "properties": {
+          "transcriptionSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_conference",
+      "name": "Create Conference",
+      "description": "Create a conference call",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["friendlyName"],
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "statusCallback": { "type": "string" },
+          "record": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_conference",
+      "name": "Get Conference",
+      "description": "Get conference details",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["conferenceSid"],
+        "properties": {
+          "conferenceSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_conferences",
+      "name": "List Conferences",
+      "description": "List all conferences",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["init", "in-progress", "completed"] },
+          "friendlyName": { "type": "string" },
+          "pageSize": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "update_conference",
+      "name": "Update Conference",
+      "description": "Update a conference (e.g., end it)",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["conferenceSid"],
+        "properties": {
+          "conferenceSid": { "type": "string" },
+          "status": { "type": "string", "enum": ["completed"] },
+          "announceUrl": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "add_conference_participant",
+      "name": "Add Conference Participant",
+      "description": "Add a participant to a conference",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["conferenceSid", "from", "to"],
+        "properties": {
+          "conferenceSid": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "muted": { "type": "boolean" },
+          "hold": { "type": "boolean" },
+          "coaching": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "update_conference_participant",
+      "name": "Update Conference Participant",
+      "description": "Update participant settings (mute, hold, etc.)",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["conferenceSid", "participantSid"],
+        "properties": {
+          "conferenceSid": { "type": "string" },
+          "participantSid": { "type": "string" },
+          "muted": { "type": "boolean" },
+          "hold": { "type": "boolean" },
+          "coaching": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "remove_conference_participant",
+      "name": "Remove Conference Participant",
+      "description": "Remove a participant from a conference",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["conferenceSid", "participantSid"],
+        "properties": {
+          "conferenceSid": { "type": "string" },
+          "participantSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_queue",
+      "name": "Create Queue",
+      "description": "Create a call queue",
+      "category": "voice",
+      "configSchema": {
+        "type": "object",
+        "required": ["friendlyName"],
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "maxSize": { "type": "number" }
+        }
+      }
+    },
+    {
       "id": "lookup_phone",
       "name": "Lookup Phone Number",
       "description": "Get carrier and line type information for a phone number",
@@ -87,41 +476,633 @@
         "required": ["phoneNumber"],
         "properties": {
           "phoneNumber": { "type": "string", "description": "Phone number in E.164 format" },
-          "fields": { "type": "array", "items": { "type": "string" }, "description": "Data fields to include" }
+          "fields": { "type": "array", "items": { "type": "string" }, "description": "Data fields to include (line_type_intelligence, caller_name, etc.)" }
+        }
+      }
+    },
+    {
+      "id": "lookup_line_type",
+      "name": "Lookup Line Type",
+      "description": "Identify if a number is mobile, landline, or VoIP",
+      "category": "lookup",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumber"],
+        "properties": {
+          "phoneNumber": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "lookup_caller_name",
+      "name": "Lookup Caller Name",
+      "description": "Get caller name (CNAM) for a phone number",
+      "category": "lookup",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumber"],
+        "properties": {
+          "phoneNumber": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "lookup_sim_swap",
+      "name": "Lookup SIM Swap",
+      "description": "Check if a SIM swap has occurred recently (fraud detection)",
+      "category": "lookup",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumber"],
+        "properties": {
+          "phoneNumber": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "lookup_identity_match",
+      "name": "Lookup Identity Match",
+      "description": "Verify if phone number belongs to a specific person",
+      "category": "lookup",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumber"],
+        "properties": {
+          "phoneNumber": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "addressLine1": { "type": "string" },
+          "city": { "type": "string" },
+          "postalCode": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_verify_service",
+      "name": "Create Verify Service",
+      "description": "Create a verification service",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["friendlyName"],
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "codeLength": { "type": "number", "default": 6 },
+          "lookupEnabled": { "type": "boolean" },
+          "skipSmsToLandlines": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_verify_service",
+      "name": "Get Verify Service",
+      "description": "Get verification service details",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid"],
+        "properties": {
+          "serviceSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_verify_service",
+      "name": "Update Verify Service",
+      "description": "Update verification service settings",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "codeLength": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "delete_verify_service",
+      "name": "Delete Verify Service",
+      "description": "Delete a verification service",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid"],
+        "properties": {
+          "serviceSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "send_verification",
+      "name": "Send Verification",
+      "description": "Send a verification code via SMS, call, or email",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid", "to", "channel"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "to": { "type": "string", "description": "Phone number or email" },
+          "channel": { "type": "string", "enum": ["sms", "call", "email", "whatsapp"] },
+          "locale": { "type": "string" },
+          "customCode": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "check_verification",
+      "name": "Check Verification",
+      "description": "Verify a code submitted by user",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid", "to", "code"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "to": { "type": "string" },
+          "code": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "cancel_verification",
+      "name": "Cancel Verification",
+      "description": "Cancel a pending verification",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid", "verificationSid"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "verificationSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_totp_factor",
+      "name": "Create TOTP Factor",
+      "description": "Create a TOTP authenticator factor",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid", "identity", "friendlyName"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "identity": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "factorType": { "type": "string", "enum": ["totp"] }
+        }
+      }
+    },
+    {
+      "id": "verify_totp",
+      "name": "Verify TOTP",
+      "description": "Verify a TOTP code",
+      "category": "verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["serviceSid", "identity", "factorSid", "code"],
+        "properties": {
+          "serviceSid": { "type": "string" },
+          "identity": { "type": "string" },
+          "factorSid": { "type": "string" },
+          "code": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "buy_phone_number",
+      "name": "Buy Phone Number",
+      "description": "Purchase a phone number",
+      "category": "phone_numbers",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumber"],
+        "properties": {
+          "phoneNumber": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "voiceUrl": { "type": "string" },
+          "smsUrl": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "search_available_numbers",
+      "name": "Search Available Numbers",
+      "description": "Search for available phone numbers to purchase",
+      "category": "phone_numbers",
+      "configSchema": {
+        "type": "object",
+        "required": ["countryCode"],
+        "properties": {
+          "countryCode": { "type": "string" },
+          "areaCode": { "type": "string" },
+          "contains": { "type": "string" },
+          "smsEnabled": { "type": "boolean" },
+          "voiceEnabled": { "type": "boolean" },
+          "mmsEnabled": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "get_phone_number",
+      "name": "Get Phone Number",
+      "description": "Get details of an owned phone number",
+      "category": "phone_numbers",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumberSid"],
+        "properties": {
+          "phoneNumberSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_phone_number",
+      "name": "Update Phone Number",
+      "description": "Update phone number settings",
+      "category": "phone_numbers",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumberSid"],
+        "properties": {
+          "phoneNumberSid": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "voiceUrl": { "type": "string" },
+          "smsUrl": { "type": "string" },
+          "voiceMethod": { "type": "string", "enum": ["GET", "POST"] },
+          "smsMethod": { "type": "string", "enum": ["GET", "POST"] }
+        }
+      }
+    },
+    {
+      "id": "release_phone_number",
+      "name": "Release Phone Number",
+      "description": "Release (cancel) a phone number",
+      "category": "phone_numbers",
+      "configSchema": {
+        "type": "object",
+        "required": ["phoneNumberSid"],
+        "properties": {
+          "phoneNumberSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_phone_numbers",
+      "name": "List Phone Numbers",
+      "description": "List all owned phone numbers",
+      "category": "phone_numbers",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "phoneNumber": { "type": "string" },
+          "pageSize": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "create_subaccount",
+      "name": "Create Subaccount",
+      "description": "Create a subaccount",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["friendlyName"],
+        "properties": {
+          "friendlyName": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_subaccount",
+      "name": "Update Subaccount",
+      "description": "Update subaccount settings",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "required": ["accountSid"],
+        "properties": {
+          "accountSid": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "suspended", "closed"] }
+        }
+      }
+    },
+    {
+      "id": "list_subaccounts",
+      "name": "List Subaccounts",
+      "description": "List all subaccounts",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_account",
+      "name": "Get Account",
+      "description": "Get account details",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "accountSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_balance",
+      "name": "Get Balance",
+      "description": "Get account balance",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "accountSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_usage_records",
+      "name": "Get Usage Records",
+      "description": "Get usage records for billing",
+      "category": "accounts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "category": { "type": "string" },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_studio_flow",
+      "name": "Create Studio Flow",
+      "description": "Create a Studio flow (visual IVR builder)",
+      "category": "studio",
+      "configSchema": {
+        "type": "object",
+        "required": ["friendlyName", "definition"],
+        "properties": {
+          "friendlyName": { "type": "string" },
+          "definition": { "type": "object" },
+          "status": { "type": "string", "enum": ["draft", "published"] }
+        }
+      }
+    },
+    {
+      "id": "update_studio_flow",
+      "name": "Update Studio Flow",
+      "description": "Update a Studio flow",
+      "category": "studio",
+      "configSchema": {
+        "type": "object",
+        "required": ["flowSid"],
+        "properties": {
+          "flowSid": { "type": "string" },
+          "friendlyName": { "type": "string" },
+          "definition": { "type": "object" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_studio_flow",
+      "name": "Delete Studio Flow",
+      "description": "Delete a Studio flow",
+      "category": "studio",
+      "configSchema": {
+        "type": "object",
+        "required": ["flowSid"],
+        "properties": {
+          "flowSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "get_studio_flow",
+      "name": "Get Studio Flow",
+      "description": "Get Studio flow details",
+      "category": "studio",
+      "configSchema": {
+        "type": "object",
+        "required": ["flowSid"],
+        "properties": {
+          "flowSid": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_studio_flows",
+      "name": "List Studio Flows",
+      "description": "List all Studio flows",
+      "category": "studio",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "pageSize": { "type": "number" }
+        }
+      }
+    },
+    {
+      "id": "trigger_studio_flow",
+      "name": "Trigger Studio Flow",
+      "description": "Trigger a Studio flow execution",
+      "category": "studio",
+      "configSchema": {
+        "type": "object",
+        "required": ["flowSid", "to", "from"],
+        "properties": {
+          "flowSid": { "type": "string" },
+          "to": { "type": "string" },
+          "from": { "type": "string" },
+          "parameters": { "type": "object" }
         }
       }
     }
   ],
   "triggers": [
     {
-      "id": "on_message_received",
+      "id": "message_received",
       "name": "Message Received",
-      "description": "Triggered when an SMS or WhatsApp message is received",
+      "description": "Triggered when an SMS or MMS message is received",
       "event": "message.received"
     },
     {
-      "id": "on_message_delivered",
+      "id": "message_sent",
+      "name": "Message Sent",
+      "description": "Triggered when a message is sent",
+      "event": "message.sent"
+    },
+    {
+      "id": "message_delivered",
       "name": "Message Delivered",
       "description": "Triggered when a message is successfully delivered",
       "event": "message.delivered"
     },
     {
-      "id": "on_message_failed",
+      "id": "message_failed",
       "name": "Message Failed",
       "description": "Triggered when a message fails to send",
       "event": "message.failed"
     },
     {
-      "id": "on_call_completed",
+      "id": "message_undelivered",
+      "name": "Message Undelivered",
+      "description": "Triggered when a message cannot be delivered",
+      "event": "message.undelivered"
+    },
+    {
+      "id": "message_read",
+      "name": "Message Read",
+      "description": "Triggered when a WhatsApp message is read",
+      "event": "message.read"
+    },
+    {
+      "id": "whatsapp_received",
+      "name": "WhatsApp Received",
+      "description": "Triggered when a WhatsApp message is received",
+      "event": "whatsapp.received"
+    },
+    {
+      "id": "call_initiated",
+      "name": "Call Initiated",
+      "description": "Triggered when a call is initiated",
+      "event": "call.initiated"
+    },
+    {
+      "id": "call_ringing",
+      "name": "Call Ringing",
+      "description": "Triggered when a call starts ringing",
+      "event": "call.ringing"
+    },
+    {
+      "id": "call_answered",
+      "name": "Call Answered",
+      "description": "Triggered when a call is answered",
+      "event": "call.answered"
+    },
+    {
+      "id": "call_completed",
       "name": "Call Completed",
-      "description": "Triggered when a call ends",
+      "description": "Triggered when a call ends normally",
       "event": "call.completed"
     },
     {
-      "id": "on_recording_completed",
+      "id": "call_busy",
+      "name": "Call Busy",
+      "description": "Triggered when a call receives busy signal",
+      "event": "call.busy"
+    },
+    {
+      "id": "call_no_answer",
+      "name": "Call No Answer",
+      "description": "Triggered when a call is not answered",
+      "event": "call.no-answer"
+    },
+    {
+      "id": "call_failed",
+      "name": "Call Failed",
+      "description": "Triggered when a call fails",
+      "event": "call.failed"
+    },
+    {
+      "id": "call_canceled",
+      "name": "Call Canceled",
+      "description": "Triggered when a call is canceled",
+      "event": "call.canceled"
+    },
+    {
+      "id": "recording_completed",
       "name": "Recording Completed",
       "description": "Triggered when a call recording is ready",
       "event": "recording.completed"
+    },
+    {
+      "id": "recording_failed",
+      "name": "Recording Failed",
+      "description": "Triggered when recording fails",
+      "event": "recording.failed"
+    },
+    {
+      "id": "transcription_completed",
+      "name": "Transcription Completed",
+      "description": "Triggered when a transcription is ready",
+      "event": "transcription.completed"
+    },
+    {
+      "id": "conference_started",
+      "name": "Conference Started",
+      "description": "Triggered when a conference call starts",
+      "event": "conference.start"
+    },
+    {
+      "id": "conference_ended",
+      "name": "Conference Ended",
+      "description": "Triggered when a conference call ends",
+      "event": "conference.end"
+    },
+    {
+      "id": "participant_joined",
+      "name": "Participant Joined",
+      "description": "Triggered when a participant joins a conference",
+      "event": "conference.participant-join"
+    },
+    {
+      "id": "participant_left",
+      "name": "Participant Left",
+      "description": "Triggered when a participant leaves a conference",
+      "event": "conference.participant-leave"
+    },
+    {
+      "id": "verification_started",
+      "name": "Verification Started",
+      "description": "Triggered when a verification is initiated",
+      "event": "verify.started"
+    },
+    {
+      "id": "verification_approved",
+      "name": "Verification Approved",
+      "description": "Triggered when a verification code is approved",
+      "event": "verify.approved"
+    },
+    {
+      "id": "verification_denied",
+      "name": "Verification Denied",
+      "description": "Triggered when a verification code is denied",
+      "event": "verify.denied"
+    },
+    {
+      "id": "verification_failed",
+      "name": "Verification Failed",
+      "description": "Triggered when a verification fails",
+      "event": "verify.failed"
+    },
+    {
+      "id": "verification_expired",
+      "name": "Verification Expired",
+      "description": "Triggered when a verification expires",
+      "event": "verify.expired"
+    },
+    {
+      "id": "studio_flow_completed",
+      "name": "Studio Flow Completed",
+      "description": "Triggered when a Studio flow execution completes",
+      "event": "studio.execution.completed"
+    },
+    {
+      "id": "studio_flow_failed",
+      "name": "Studio Flow Failed",
+      "description": "Triggered when a Studio flow execution fails",
+      "event": "studio.execution.failed"
     }
   ],
   "webhooks": {
@@ -152,6 +1133,18 @@
           "properties": {
             "to": { "type": "string", "description": "Recipient WhatsApp number" },
             "message": { "type": "string", "description": "Message to send" }
+          }
+        }
+      },
+      {
+        "name": "twilio_make_call",
+        "description": "Initiate a voice call",
+        "inputSchema": {
+          "type": "object",
+          "required": ["to"],
+          "properties": {
+            "to": { "type": "string", "description": "Number to call" },
+            "message": { "type": "string", "description": "Message to speak (TwiML Say)" }
           }
         }
       }
