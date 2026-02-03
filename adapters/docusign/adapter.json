@@ -2,7 +2,7 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "docusign",
   "name": "DocuSign",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Send documents for electronic signature, track envelope status, and automate contract workflows with DocuSign.",
   "type": "esignature",
   "base_url": "https://demo.docusign.net/restapi",

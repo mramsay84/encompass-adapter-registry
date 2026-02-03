@@ -2,7 +2,7 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "xero",
   "name": "Xero",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "SMB accounting integration for managing contacts, invoices, payments, and chart of accounts.",
   "type": "crm",
   "base_url": "https://api.xero.com",
