@@ -89,7 +89,7 @@
     {
       "slug": "docusign",
       "name": "DocuSign",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "category": "esignature",
       "path": "adapters/docusign",
       "status": "active",
@@ -107,7 +107,7 @@
     {
       "slug": "xero",
       "name": "Xero",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "category": "crm",
       "path": "adapters/xero",
       "status": "active",
