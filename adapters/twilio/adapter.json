@@ -2,7 +2,7 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "twilio",
   "name": "Twilio",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Send SMS, WhatsApp messages, and make voice calls. Includes phone number lookup and call recordings.",
   "type": "sms",
   "provider": {

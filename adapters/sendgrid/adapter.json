@@ -2,7 +2,7 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "sendgrid",
   "name": "SendGrid",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Send transactional emails, use dynamic templates, manage contacts, and track email engagement.",
   "type": "email",
   "provider": {

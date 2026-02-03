@@ -2,7 +2,7 @@
   "$schema": "../../schemas/adapter.schema.json",
   "slug": "sumsub",
   "name": "SumSub",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "KYC/KYB identity verification with document checks, liveness detection, and AML screening. Supports 220+ countries.",
   "type": "kyc",
   "provider": {

@@ -71,7 +71,7 @@
     {
       "slug": "sendgrid",
       "name": "SendGrid",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "email",
       "path": "adapters/sendgrid",
       "status": "active",
@@ -80,7 +80,7 @@
     {
       "slug": "twilio",
       "name": "Twilio",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "sms",
       "path": "adapters/twilio",
       "status": "active",
@@ -89,7 +89,7 @@
     {
       "slug": "docusign",
       "name": "DocuSign",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "esignature",
       "path": "adapters/docusign",
       "status": "active",
@@ -98,7 +98,7 @@
     {
       "slug": "sumsub",
       "name": "SumSub",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "kyc",
       "path": "adapters/sumsub",
       "status": "active",
@@ -107,7 +107,7 @@
     {
       "slug": "xero",
       "name": "Xero",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "crm",
       "path": "adapters/xero",
       "status": "active",
