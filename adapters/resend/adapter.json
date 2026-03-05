@@ -1,0 +1,51 @@
+{
+  "slug": "resend",
+  "name": "Resend",
+  "version": "1.0.0",
+  "description": "Send transactional emails, manage domains, and track email delivery with Resend's modern email API.",
+  "type": "email",
+  "base_url": "https://api.resend.com",
+  "provider": {
+    "name": "Resend",
+    "website": "https://resend.com",
+    "documentation": "https://resend.com/docs/api-reference/introduction"
+  },
+  "authentication": {
+    "type": "api_key",
+    "fields": [
+      {
+        "name": "api_key",
+        "type": "password",
+        "label": "API Key",
+        "required": true,
+        "placeholder": "re_xxxxxxxxxxxxxxxxxxxxxxxx",
+        "helpText": "Resend API key. Generate one at resend.com/api-keys."
+      },
+      {
+        "name": "default_from",
+        "type": "text",
+        "label": "Default From Email",
+        "required": false,
+        "placeholder": "noreply@yourdomain.com",
+        "helpText": "Default sender email address (must be from a verified domain)."
+      },
+      {
+        "name": "default_from_name",
+        "type": "text",
+        "label": "Default From Name",
+        "required": false,
+        "placeholder": "Your Company",
+        "helpText": "Default sender display name."
+      }
+    ],
+    "testEndpoint": "/domains"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 120
+  },
+  "icon": "Mail",
+  "tags": ["email", "transactional", "api", "developer-first"],
+  "aiDescription": "Resend is a modern transactional email API built for developers. It supports sending single and batch emails, managing sending domains, email templates, and provides webhook-based delivery tracking. Authentication uses a Bearer API key (re_xxx format). Rate limit is 2 requests/second (120/min).",
+  "aiInstructions": "When using the Resend adapter:\n\n1. Authentication: Bearer token in Authorization header using the API key\n2. All requests go to https://api.resend.com\n3. Send emails via POST /emails with to, from, subject, and html/text fields\n4. Batch send up to 100 emails via POST /emails/batch\n5. Verify domains before sending (from address must be on a verified domain)\n6. Webhooks use Svix — verify signatures with the svix-id, svix-timestamp, and svix-signature headers\n7. Track delivery via webhook events: email.sent, email.delivered, email.bounced, email.opened, email.clicked",
+  "setupInstructions": "1. Sign up at resend.com and generate an API key\n2. Add and verify your sending domain in the Resend dashboard\n3. Enter your API key and default from address in the credentials form\n4. Test the connection to verify your key has the correct permissions"
+}

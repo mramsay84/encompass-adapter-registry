@@ -126,6 +126,15 @@
       "path": "adapters/aircall",
       "status": "active",
       "featured": true
+    },
+    {
+      "slug": "resend",
+      "name": "Resend",
+      "version": "1.0.0",
+      "category": "email",
+      "path": "adapters/resend",
+      "status": "active",
+      "featured": false
     }
   ]
 }

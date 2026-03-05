@@ -1,0 +1,864 @@
+{
+  "actions": [
+    {
+      "id": "send_email",
+      "name": "Send Email",
+      "description": "Send a transactional email with HTML and/or plain text content",
+      "category": "emails",
+      "method": "POST",
+      "endpoint": "/emails",
+      "configSchema": {
+        "type": "object",
+        "required": ["to", "subject"],
+        "properties": {
+          "to": {
+            "type": ["string", "array"],
+            "description": "Recipient email address(es)"
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender email (must be from a verified domain)"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject line"
+          },
+          "html": {
+            "type": "string",
+            "description": "HTML content of the email"
+          },
+          "text": {
+            "type": "string",
+            "description": "Plain text content of the email"
+          },
+          "cc": {
+            "type": ["string", "array"],
+            "description": "CC recipient(s)"
+          },
+          "bcc": {
+            "type": ["string", "array"],
+            "description": "BCC recipient(s)"
+          },
+          "reply_to": {
+            "type": ["string", "array"],
+            "description": "Reply-to email address(es)"
+          },
+          "headers": {
+            "type": "object",
+            "description": "Custom email headers"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            },
+            "description": "Tags for categorization and analytics"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "description": "ISO 8601 datetime for scheduled delivery"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Email ID" }
+        }
+      }
+    },
+    {
+      "id": "send_batch_emails",
+      "name": "Send Batch Emails",
+      "description": "Send up to 100 emails in a single API call",
+      "category": "emails",
+      "method": "POST",
+      "endpoint": "/emails/batch",
+      "configSchema": {
+        "type": "object",
+        "required": ["emails"],
+        "properties": {
+          "emails": {
+            "type": "array",
+            "description": "Array of email objects (max 100), each with to, from, subject, html/text",
+            "items": {
+              "type": "object",
+              "required": ["to", "from", "subject"],
+              "properties": {
+                "to": { "type": ["string", "array"] },
+                "from": { "type": "string" },
+                "subject": { "type": "string" },
+                "html": { "type": "string" },
+                "text": { "type": "string" },
+                "cc": { "type": ["string", "array"] },
+                "bcc": { "type": ["string", "array"] },
+                "reply_to": { "type": ["string", "array"] },
+                "headers": { "type": "object" },
+                "tags": { "type": "array" }
+              }
+            }
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "get_email",
+      "name": "Get Email",
+      "description": "Retrieve details and status of a sent email by ID",
+      "category": "emails",
+      "method": "GET",
+      "endpoint": "/emails/{email_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["email_id"],
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The ID of the email to retrieve"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "array" },
+          "subject": { "type": "string" },
+          "created_at": { "type": "string" },
+          "last_event": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "cancel_email",
+      "name": "Cancel Scheduled Email",
+      "description": "Cancel a scheduled email that has not yet been sent",
+      "category": "emails",
+      "method": "POST",
+      "endpoint": "/emails/{email_id}/cancel",
+      "configSchema": {
+        "type": "object",
+        "required": ["email_id"],
+        "properties": {
+          "email_id": {
+            "type": "string",
+            "description": "The ID of the scheduled email to cancel"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "object": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "create_domain",
+      "name": "Create Domain",
+      "description": "Add a new sending domain to your Resend account",
+      "category": "domains",
+      "method": "POST",
+      "endpoint": "/domains",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The domain name (e.g., yourdomain.com)"
+          },
+          "region": {
+            "type": "string",
+            "enum": ["us-east-1", "eu-west-1", "sa-east-1"],
+            "description": "Region for the domain"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "type": "string" },
+          "records": { "type": "array" }
+        }
+      }
+    },
+    {
+      "id": "list_domains",
+      "name": "List Domains",
+      "description": "Retrieve a list of all verified and pending domains",
+      "category": "domains",
+      "method": "GET",
+      "endpoint": "/domains",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "status": { "type": "string" },
+                "region": { "type": "string" },
+                "created_at": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "get_domain",
+      "name": "Get Domain",
+      "description": "Retrieve details and DNS records for a specific domain",
+      "category": "domains",
+      "method": "GET",
+      "endpoint": "/domains/{domain_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["domain_id"],
+        "properties": {
+          "domain_id": {
+            "type": "string",
+            "description": "The ID of the domain to retrieve"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "type": "string" },
+          "region": { "type": "string" },
+          "records": { "type": "array" }
+        }
+      }
+    },
+    {
+      "id": "verify_domain",
+      "name": "Verify Domain",
+      "description": "Trigger DNS verification for a domain",
+      "category": "domains",
+      "method": "POST",
+      "endpoint": "/domains/{domain_id}/verify",
+      "configSchema": {
+        "type": "object",
+        "required": ["domain_id"],
+        "properties": {
+          "domain_id": {
+            "type": "string",
+            "description": "The ID of the domain to verify"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "object": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_domain",
+      "name": "Delete Domain",
+      "description": "Remove a domain from your Resend account",
+      "category": "domains",
+      "method": "DELETE",
+      "endpoint": "/domains/{domain_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["domain_id"],
+        "properties": {
+          "domain_id": {
+            "type": "string",
+            "description": "The ID of the domain to delete"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "object": { "type": "string" },
+          "id": { "type": "string" },
+          "deleted": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "create_api_key",
+      "name": "Create API Key",
+      "description": "Create a new API key with specified permissions",
+      "category": "api-keys",
+      "method": "POST",
+      "endpoint": "/api-keys",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "A descriptive name for the API key"
+          },
+          "permission": {
+            "type": "string",
+            "enum": ["full_access", "sending_access"],
+            "description": "Permission level for the key"
+          },
+          "domain_id": {
+            "type": "string",
+            "description": "Restrict the key to a specific domain"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "token": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_api_keys",
+      "name": "List API Keys",
+      "description": "Retrieve a list of all API keys",
+      "category": "api-keys",
+      "method": "GET",
+      "endpoint": "/api-keys",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "created_at": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "delete_api_key",
+      "name": "Delete API Key",
+      "description": "Remove an API key",
+      "category": "api-keys",
+      "method": "DELETE",
+      "endpoint": "/api-keys/{api_key_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["api_key_id"],
+        "properties": {
+          "api_key_id": {
+            "type": "string",
+            "description": "The ID of the API key to delete"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "id": "create_audience",
+      "name": "Create Audience",
+      "description": "Create a new audience (contact list) for managing recipients",
+      "category": "audiences",
+      "method": "POST",
+      "endpoint": "/audiences",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the audience"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "object": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_audiences",
+      "name": "List Audiences",
+      "description": "Retrieve a list of all audiences",
+      "category": "audiences",
+      "method": "GET",
+      "endpoint": "/audiences",
+      "configSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "created_at": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "get_audience",
+      "name": "Get Audience",
+      "description": "Retrieve details of a specific audience",
+      "category": "audiences",
+      "method": "GET",
+      "endpoint": "/audiences/{audience_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "created_at": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_audience",
+      "name": "Delete Audience",
+      "description": "Remove an audience and all its contacts",
+      "category": "audiences",
+      "method": "DELETE",
+      "endpoint": "/audiences/{audience_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience to delete"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "object": { "type": "string" },
+          "id": { "type": "string" },
+          "deleted": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Add a contact to an audience",
+      "category": "contacts",
+      "method": "POST",
+      "endpoint": "/audiences/{audience_id}/contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id", "email"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience"
+          },
+          "email": {
+            "type": "string",
+            "description": "Contact email address"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Contact first name"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Contact last name"
+          },
+          "unsubscribed": {
+            "type": "boolean",
+            "description": "Whether the contact is unsubscribed"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "object": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "List all contacts in an audience",
+      "category": "contacts",
+      "method": "GET",
+      "endpoint": "/audiences/{audience_id}/contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "email": { "type": "string" },
+                "first_name": { "type": "string" },
+                "last_name": { "type": "string" },
+                "unsubscribed": { "type": "boolean" },
+                "created_at": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "get_contact",
+      "name": "Get Contact",
+      "description": "Retrieve details of a specific contact",
+      "category": "contacts",
+      "method": "GET",
+      "endpoint": "/audiences/{audience_id}/contacts/{contact_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id", "contact_id"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience"
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "The ID of the contact"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "unsubscribed": { "type": "boolean" },
+          "created_at": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "update_contact",
+      "name": "Update Contact",
+      "description": "Update a contact's details in an audience",
+      "category": "contacts",
+      "method": "PATCH",
+      "endpoint": "/audiences/{audience_id}/contacts/{contact_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id", "contact_id"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience"
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "The ID of the contact"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Updated first name"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Updated last name"
+          },
+          "unsubscribed": {
+            "type": "boolean",
+            "description": "Updated unsubscribe status"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "object": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "delete_contact",
+      "name": "Delete Contact",
+      "description": "Remove a contact from an audience",
+      "category": "contacts",
+      "method": "DELETE",
+      "endpoint": "/audiences/{audience_id}/contacts/{contact_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["audience_id", "contact_id"],
+        "properties": {
+          "audience_id": {
+            "type": "string",
+            "description": "The ID of the audience"
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "The ID of the contact to delete"
+          }
+        }
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "object": { "type": "string" },
+          "id": { "type": "string" },
+          "deleted": { "type": "boolean" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "email_sent",
+      "name": "Email Sent",
+      "event": "email.sent",
+      "description": "Triggered when an email is successfully sent to the recipient's mail server",
+      "category": "Email Delivery",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.sent" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "email_delivered",
+      "name": "Email Delivered",
+      "event": "email.delivered",
+      "description": "Triggered when an email is delivered to the recipient's inbox",
+      "category": "Email Delivery",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.delivered" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "email_bounced",
+      "name": "Email Bounced",
+      "event": "email.bounced",
+      "description": "Triggered when an email bounces (hard or soft bounce)",
+      "category": "Email Delivery",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.bounced" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" },
+              "bounce_type": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "email_delivery_delayed",
+      "name": "Email Delivery Delayed",
+      "event": "email.delivery_delayed",
+      "description": "Triggered when email delivery is temporarily delayed",
+      "category": "Email Delivery",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.delivery_delayed" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "email_complained",
+      "name": "Email Complained",
+      "event": "email.complained",
+      "description": "Triggered when a recipient marks the email as spam",
+      "category": "Email Engagement",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.complained" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "email_opened",
+      "name": "Email Opened",
+      "event": "email.opened",
+      "description": "Triggered when a recipient opens the email",
+      "category": "Email Engagement",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.opened" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "email_clicked",
+      "name": "Email Clicked",
+      "event": "email.clicked",
+      "description": "Triggered when a recipient clicks a link in the email",
+      "category": "Email Engagement",
+      "payloadSchema": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "const": "email.clicked" },
+          "created_at": { "type": "string" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "email_id": { "type": "string" },
+              "from": { "type": "string" },
+              "to": { "type": "array" },
+              "subject": { "type": "string" },
+              "click": {
+                "type": "object",
+                "properties": {
+                  "link": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "svix-signature",
+    "signatureAlgorithm": "hmac-sha256"
+  }
+}
