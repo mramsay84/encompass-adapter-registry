@@ -1,0 +1,45 @@
+{
+  "$schema": "../../schemas/adapter.schema.json",
+  "slug": "aircall",
+  "name": "Aircall",
+  "version": "1.0.0",
+  "description": "Cloud phone system for modern businesses. Manage calls, contacts, teams, and conversation intelligence via the Aircall API.",
+  "type": "telephony",
+  "base_url": "https://api.aircall.io/v1",
+  "provider": {
+    "name": "Aircall",
+    "website": "https://aircall.io",
+    "documentation": "https://developer.aircall.io/api-references"
+  },
+  "authentication": {
+    "type": "basic",
+    "fields": [
+      {
+        "name": "api_id",
+        "label": "API ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "Your Aircall API ID",
+        "helpText": "Found in Aircall Dashboard → Integrations → API Keys"
+      },
+      {
+        "name": "api_token",
+        "label": "API Token",
+        "type": "password",
+        "required": true,
+        "placeholder": "Your Aircall API Token",
+        "helpText": "Found in Aircall Dashboard → Integrations → API Keys"
+      }
+    ],
+    "testEndpoint": "/company"
+  },
+  "rateLimit": {
+    "requestsPerMinute": 60,
+    "requestsPerHour": 3600
+  },
+  "icon": "Phone",
+  "tags": ["telephony", "calls", "voice", "phone", "contact-center", "transcription", "aircall"],
+  "aiDescription": "Aircall is a cloud-based phone system designed for modern businesses. It provides call management, contact management, team routing, conversation intelligence (transcription, sentiment analysis, call summaries), and messaging capabilities. The API enables full programmatic control over calls, contacts, users, teams, numbers, tags, and dialer campaigns. Authentication uses Basic auth with an API ID and API Token. Rate limited to 60 requests per minute.",
+  "aiInstructions": "When using the Aircall adapter:\n\n1. **Authentication**: Use Basic auth with api_id:api_token\n2. **Calls**: Use list_calls with date filters for recent activity. Call recordings are available via recording URLs.\n3. **Contacts**: Aircall contacts are separate from CRM contacts. Use search_contacts to find by phone number or email.\n4. **Teams**: Teams group users for call routing. Use list_teams to see available routing groups.\n5. **Numbers**: Each number has specific routing rules. Use list_numbers to see available phone numbers.\n6. **Webhooks**: Aircall sends webhook events for calls, contacts, messaging, and conversation intelligence. Verify signatures using HMAC-SHA256.\n7. **Pagination**: Use per_page and page parameters. Default page size is 20, max 50.\n8. **Rate Limits**: 60 requests/minute. Implement exponential backoff on 429 responses.",
+  "setupInstructions": "## Setting up Aircall\n\n1. Log in to your [Aircall Dashboard](https://dashboard.aircall.io)\n2. Go to **Integrations** → **API Keys**\n3. Click **Generate API Key**\n4. Copy the **API ID** and **API Token**\n5. Enter both values in the credential fields above\n6. Click **Test Connection** to verify\n\n### Webhook Setup (Optional)\n\nTo receive real-time events:\n1. In Aircall Dashboard, go to **Integrations** → **Webhooks**\n2. Add the webhook URL provided by Encompass\n3. Select the events you want to receive\n4. Save and note the webhook token for signature verification"
+}

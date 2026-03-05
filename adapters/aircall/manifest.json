@@ -1,0 +1,600 @@
+{
+  "actions": [
+    {
+      "id": "list_calls",
+      "name": "List Calls",
+      "description": "List recent calls with optional date and direction filters",
+      "category": "Calls",
+      "method": "GET",
+      "endpoint": "/calls",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "from": { "type": "string", "format": "date-time", "description": "Filter calls from this date (ISO 8601)" },
+          "to": { "type": "string", "format": "date-time", "description": "Filter calls to this date (ISO 8601)" },
+          "direction": { "type": "string", "enum": ["inbound", "outbound"], "description": "Filter by call direction" },
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50, "description": "Results per page (max 50)" },
+          "page": { "type": "integer", "minimum": 1, "description": "Page number" }
+        }
+      }
+    },
+    {
+      "id": "get_call",
+      "name": "Get Call",
+      "description": "Get detailed information about a specific call including recording URL",
+      "category": "Calls",
+      "method": "GET",
+      "endpoint": "/calls/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Call ID" }
+        }
+      }
+    },
+    {
+      "id": "search_calls",
+      "name": "Search Calls",
+      "description": "Search calls by phone number, user, or other criteria",
+      "category": "Calls",
+      "method": "GET",
+      "endpoint": "/calls/search",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "phone_number": { "type": "string", "description": "Phone number to search (E.164 format)" },
+          "from": { "type": "string", "format": "date-time", "description": "Start date" },
+          "to": { "type": "string", "format": "date-time", "description": "End date" },
+          "direction": { "type": "string", "enum": ["inbound", "outbound"] },
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "transfer_call",
+      "name": "Transfer Call",
+      "description": "Transfer an active call to another user or number",
+      "category": "Calls",
+      "method": "POST",
+      "endpoint": "/calls/{id}/transfers",
+      "configSchema": {
+        "type": "object",
+        "required": ["id", "user_id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Call ID" },
+          "user_id": { "type": "integer", "description": "User ID to transfer to" }
+        }
+      }
+    },
+    {
+      "id": "comment_call",
+      "name": "Comment on Call",
+      "description": "Add a comment or note to a call",
+      "category": "Calls",
+      "method": "POST",
+      "endpoint": "/calls/{id}/comments",
+      "configSchema": {
+        "type": "object",
+        "required": ["id", "content"],
+        "properties": {
+          "id": { "type": "integer", "description": "Call ID" },
+          "content": { "type": "string", "description": "Comment text" }
+        }
+      }
+    },
+    {
+      "id": "tag_call",
+      "name": "Tag Call",
+      "description": "Add a tag to a call for categorization",
+      "category": "Calls",
+      "method": "POST",
+      "endpoint": "/calls/{id}/tags",
+      "configSchema": {
+        "type": "object",
+        "required": ["id", "tag_id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Call ID" },
+          "tag_id": { "type": "integer", "description": "Tag ID to apply" }
+        }
+      }
+    },
+    {
+      "id": "archive_call",
+      "name": "Archive Call",
+      "description": "Archive a call to mark it as processed",
+      "category": "Calls",
+      "method": "PUT",
+      "endpoint": "/calls/{id}/archive",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Call ID" }
+        }
+      }
+    },
+    {
+      "id": "list_users",
+      "name": "List Users",
+      "description": "List all users (agents) in the Aircall account",
+      "category": "Users",
+      "method": "GET",
+      "endpoint": "/users",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "get_user",
+      "name": "Get User",
+      "description": "Get details of a specific user",
+      "category": "Users",
+      "method": "GET",
+      "endpoint": "/users/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "User ID" }
+        }
+      }
+    },
+    {
+      "id": "dial_number",
+      "name": "Dial Number",
+      "description": "Initiate an outbound call from a user to a phone number",
+      "category": "Users",
+      "method": "POST",
+      "endpoint": "/users/{user_id}/dial",
+      "configSchema": {
+        "type": "object",
+        "required": ["user_id", "phone_number", "number_id"],
+        "properties": {
+          "user_id": { "type": "integer", "description": "User ID to make the call" },
+          "phone_number": { "type": "string", "description": "Phone number to dial (E.164 format)" },
+          "number_id": { "type": "integer", "description": "Aircall number ID to use as caller ID" }
+        }
+      }
+    },
+    {
+      "id": "list_teams",
+      "name": "List Teams",
+      "description": "List all teams in the account",
+      "category": "Teams",
+      "method": "GET",
+      "endpoint": "/teams",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "get_team",
+      "name": "Get Team",
+      "description": "Get details of a specific team",
+      "category": "Teams",
+      "method": "GET",
+      "endpoint": "/teams/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Team ID" }
+        }
+      }
+    },
+    {
+      "id": "create_team",
+      "name": "Create Team",
+      "description": "Create a new team for call routing",
+      "category": "Teams",
+      "method": "POST",
+      "endpoint": "/teams",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "description": "Team name" }
+        }
+      }
+    },
+    {
+      "id": "add_user_to_team",
+      "name": "Add User to Team",
+      "description": "Add a user to a team",
+      "category": "Teams",
+      "method": "POST",
+      "endpoint": "/teams/{team_id}/users/{user_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["team_id", "user_id"],
+        "properties": {
+          "team_id": { "type": "integer", "description": "Team ID" },
+          "user_id": { "type": "integer", "description": "User ID to add" }
+        }
+      }
+    },
+    {
+      "id": "remove_user_from_team",
+      "name": "Remove User from Team",
+      "description": "Remove a user from a team",
+      "category": "Teams",
+      "method": "DELETE",
+      "endpoint": "/teams/{team_id}/users/{user_id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["team_id", "user_id"],
+        "properties": {
+          "team_id": { "type": "integer", "description": "Team ID" },
+          "user_id": { "type": "integer", "description": "User ID to remove" }
+        }
+      }
+    },
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "List all contacts in the Aircall directory",
+      "category": "Contacts",
+      "method": "GET",
+      "endpoint": "/contacts",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "get_contact",
+      "name": "Get Contact",
+      "description": "Get details of a specific contact",
+      "category": "Contacts",
+      "method": "GET",
+      "endpoint": "/contacts/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Contact ID" }
+        }
+      }
+    },
+    {
+      "id": "search_contacts",
+      "name": "Search Contacts",
+      "description": "Search contacts by phone number, email, or name",
+      "category": "Contacts",
+      "method": "GET",
+      "endpoint": "/contacts/search",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "phone_number": { "type": "string", "description": "Phone number to search" },
+          "email": { "type": "string", "description": "Email to search" },
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Create a new contact in the Aircall directory",
+      "category": "Contacts",
+      "method": "POST",
+      "endpoint": "/contacts",
+      "configSchema": {
+        "type": "object",
+        "required": ["phone_numbers"],
+        "properties": {
+          "first_name": { "type": "string", "description": "Contact first name" },
+          "last_name": { "type": "string", "description": "Contact last name" },
+          "company_name": { "type": "string", "description": "Company name" },
+          "phone_numbers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            },
+            "description": "Phone numbers"
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            },
+            "description": "Email addresses"
+          }
+        }
+      }
+    },
+    {
+      "id": "update_contact",
+      "name": "Update Contact",
+      "description": "Update an existing contact",
+      "category": "Contacts",
+      "method": "PUT",
+      "endpoint": "/contacts/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Contact ID" },
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "company_name": { "type": "string" },
+          "phone_numbers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            }
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "delete_contact",
+      "name": "Delete Contact",
+      "description": "Delete a contact from the Aircall directory",
+      "category": "Contacts",
+      "method": "DELETE",
+      "endpoint": "/contacts/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Contact ID" }
+        }
+      }
+    },
+    {
+      "id": "list_numbers",
+      "name": "List Numbers",
+      "description": "List all phone numbers in the account",
+      "category": "Numbers",
+      "method": "GET",
+      "endpoint": "/numbers",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "get_number",
+      "name": "Get Number",
+      "description": "Get details of a specific phone number",
+      "category": "Numbers",
+      "method": "GET",
+      "endpoint": "/numbers/{id}",
+      "configSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "integer", "description": "Number ID" }
+        }
+      }
+    },
+    {
+      "id": "send_message",
+      "name": "Send Message",
+      "description": "Send an SMS or text message via Aircall",
+      "category": "Messaging",
+      "method": "POST",
+      "endpoint": "/numbers/{number_id}/messages",
+      "configSchema": {
+        "type": "object",
+        "required": ["number_id", "to", "body"],
+        "properties": {
+          "number_id": { "type": "integer", "description": "Aircall number ID to send from" },
+          "to": { "type": "string", "description": "Recipient phone number (E.164 format)" },
+          "body": { "type": "string", "description": "Message content" }
+        }
+      }
+    },
+    {
+      "id": "list_tags",
+      "name": "List Tags",
+      "description": "List all available tags",
+      "category": "Tags",
+      "method": "GET",
+      "endpoint": "/tags",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "page": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    {
+      "id": "create_tag",
+      "name": "Create Tag",
+      "description": "Create a new tag for categorizing calls",
+      "category": "Tags",
+      "method": "POST",
+      "endpoint": "/tags",
+      "configSchema": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "description": "Tag name" },
+          "color": { "type": "string", "description": "Tag color (hex)" }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "call_created",
+      "name": "Call Created",
+      "description": "Triggered when a new call is initiated (inbound or outbound)",
+      "event": "call.created",
+      "category": "Calls"
+    },
+    {
+      "id": "call_answered",
+      "name": "Call Answered",
+      "description": "Triggered when a call is answered by an agent",
+      "event": "call.answered",
+      "category": "Calls"
+    },
+    {
+      "id": "call_ended",
+      "name": "Call Ended",
+      "description": "Triggered when a call ends. Includes duration, recording URL, and tags.",
+      "event": "call.ended",
+      "category": "Calls"
+    },
+    {
+      "id": "call_voicemail_left",
+      "name": "Voicemail Left",
+      "description": "Triggered when a caller leaves a voicemail",
+      "event": "call.voicemail_left",
+      "category": "Calls"
+    },
+    {
+      "id": "call_commented",
+      "name": "Call Commented",
+      "description": "Triggered when a comment is added to a call",
+      "event": "call.commented",
+      "category": "Calls"
+    },
+    {
+      "id": "call_tagged",
+      "name": "Call Tagged",
+      "description": "Triggered when a tag is added to a call",
+      "event": "call.tagged",
+      "category": "Calls"
+    },
+    {
+      "id": "call_archived",
+      "name": "Call Archived",
+      "description": "Triggered when a call is archived",
+      "event": "call.archived",
+      "category": "Calls"
+    },
+    {
+      "id": "call_assigned",
+      "name": "Call Assigned",
+      "description": "Triggered when a call is assigned to a user",
+      "event": "call.assigned",
+      "category": "Calls"
+    },
+    {
+      "id": "contact_created",
+      "name": "Contact Created",
+      "description": "Triggered when a new contact is created",
+      "event": "contact.created",
+      "category": "Contacts"
+    },
+    {
+      "id": "contact_updated",
+      "name": "Contact Updated",
+      "description": "Triggered when a contact is updated",
+      "event": "contact.updated",
+      "category": "Contacts"
+    },
+    {
+      "id": "contact_deleted",
+      "name": "Contact Deleted",
+      "description": "Triggered when a contact is deleted",
+      "event": "contact.deleted",
+      "category": "Contacts"
+    },
+    {
+      "id": "message_sent",
+      "name": "Message Sent",
+      "description": "Triggered when an SMS message is sent",
+      "event": "message.sent",
+      "category": "Messaging"
+    },
+    {
+      "id": "message_received",
+      "name": "Message Received",
+      "description": "Triggered when an SMS message is received",
+      "event": "message.received",
+      "category": "Messaging"
+    },
+    {
+      "id": "user_connected",
+      "name": "User Connected",
+      "description": "Triggered when a user (agent) comes online",
+      "event": "user.connected",
+      "category": "Users"
+    },
+    {
+      "id": "user_disconnected",
+      "name": "User Disconnected",
+      "description": "Triggered when a user (agent) goes offline",
+      "event": "user.disconnected",
+      "category": "Users"
+    },
+    {
+      "id": "number_created",
+      "name": "Number Created",
+      "description": "Triggered when a new phone number is added to the account",
+      "event": "number.created",
+      "category": "Numbers"
+    },
+    {
+      "id": "transcription_created",
+      "name": "Transcription Created",
+      "description": "Triggered when a call transcription is ready (Conversation Intelligence)",
+      "event": "transcription.created",
+      "category": "Conversation Intelligence"
+    },
+    {
+      "id": "sentiment_created",
+      "name": "Sentiment Created",
+      "description": "Triggered when sentiment analysis is ready for a call (Conversation Intelligence)",
+      "event": "sentiment.created",
+      "category": "Conversation Intelligence"
+    },
+    {
+      "id": "summary_created",
+      "name": "Summary Created",
+      "description": "Triggered when an AI call summary is ready (Conversation Intelligence)",
+      "event": "summary.created",
+      "category": "Conversation Intelligence"
+    }
+  ],
+  "webhooks": {
+    "supported": true,
+    "signatureHeader": "x-aircall-signature",
+    "signatureAlgorithm": "hmac-sha256"
+  }
+}
